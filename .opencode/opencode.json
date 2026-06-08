@@ -1,0 +1,11 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "read": {
+      "/home/pingu/Projects/PatagonIA/.opencode/gsd-core/*": "allow"
+    },
+    "external_directory": {
+      "/home/pingu/Projects/PatagonIA/.opencode/gsd-core/*": "allow"
+    }
+  }
+}

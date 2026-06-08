@@ -42,12 +42,12 @@
 
 | Requirement | Satisfied By | Status |
 |-------------|--------------|--------|
-| REQ-CORE-01 | | Not Started |
-| REQ-CORE-02 | | Not Started |
-| REQ-CORE-03 | | Not Started |
-| REQ-CORE-04 | | Not Started |
-| REQ-SOC-01 | | Not Started |
-| REQ-SOC-02 | | Not Started |
-| REQ-GAME-01 | | Not Started |
-| REQ-GAME-02 | | Not Started |
-| REQ-GAME-03 | | Not Started |
+| REQ-CORE-01 | Phase 3 | Not Started |
+| REQ-CORE-02 | Phase 2 | Not Started |
+| REQ-CORE-03 | Phase 1 | Not Started |
+| REQ-CORE-04 | Phase 2, 3 | Not Started |
+| REQ-SOC-01 | Phase 4 | Not Started |
+| REQ-SOC-02 | Phase 4 | Not Started |
+| REQ-GAME-01 | Phase 5 | Not Started |
+| REQ-GAME-02 | Phase 5 | Not Started |
+| REQ-GAME-03 | Phase 5 | Not Started |

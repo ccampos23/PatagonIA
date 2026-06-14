@@ -15,7 +15,7 @@
 - [ ] REQ-CORE-01: **Interactive Offline Map:** Integration of MapLibre Compose for rendering offline vector tiles and trails.
 - [ ] REQ-CORE-02: **On-Device ML Camera:** Real-time species recognition using CameraX and ML Kit Vision with `STRATEGY_KEEP_ONLY_LATEST`.
 - [ ] REQ-CORE-03: **Local-First Capture Journal:** Captures are instantly saved locally via Room database and marked as pending sync.
-- [ ] REQ-CORE-04: **Asset Manager:** UI to download map regions, ML models, and the verified species wiki on-demand before trips.
+- [ ] REQ-CORE-04: **First-Launch Asset Sync:** Download all required ML models and species wikis automatically on the first launch, blocking the app until complete to ensure 100% offline reliability.
 
 ### Authentication & Social (SOCIAL)
 - [ ] REQ-SOC-01: **User Accounts:** Registration and login powered by the Supabase Kotlin SDK.
@@ -36,7 +36,7 @@
 
 - **Real-Time Buddy Tracking:** Not building real-time GPS tracking of other hikers. **Reason:** Unacceptable battery drain in deep wilderness scenarios.
 - **Custom Backend from Scratch:** Not building a custom API server. **Reason:** Relying on Supabase to accelerate development and ensure offline-sync reliability.
-- **Bundling Assets in App:** Not bundling all heavy ML models and Map tiles natively in the APK. **Reason:** Bloats initial download size; requires on-demand Pre-Trip Asset Checker instead.
+- **Bundling Assets in App:** Not bundling all heavy ML models and Map tiles natively in the APK. **Reason:** Bloats initial download size. Instead, assets are downloaded via a required First-Launch Asset Sync.
 
 ## Requirements Traceability
 

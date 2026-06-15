@@ -41,7 +41,7 @@ Plans:
 
 Plans:
 - [x] 02-01: Initial First-Launch Model Download.
-- [ ] 02-02: CameraX Setup and Capture Flow.
+- [x] 02-02: CameraX Setup and Capture Flow.
 - [ ] 02-03: ML Kit Custom Model Integration.
 
 ### Phase 3: Offline Maps
@@ -95,7 +95,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Local DB | 3/3 | ✅ Complete | 2026-06-14 |
-| 2. Camera & ML Kit | 1/3 | In progress | - |
+| 2. Camera & ML Kit | 2/3 | In progress | - |
 | 3. Offline Maps | 0/2 | Not started | - |
 | 4. Sync Engine & Supabase | 0/3 | Not started | - |
 | 5. Gamification & UI Polish | 0/2 | Not started | - |

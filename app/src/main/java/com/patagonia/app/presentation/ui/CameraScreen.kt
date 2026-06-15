@@ -52,14 +52,20 @@ import androidx.core.content.ContextCompat
 import java.io.File
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import androidx.camera.core.ImageAnalysis
+import androidx.compose.runtime.collectAsState
+import com.patagonia.app.data.local.SpeciesAnalyzer
+import com.patagonia.app.presentation.viewmodel.CameraViewModel
 
 @Composable
 fun CameraScreen(
+    viewModel: CameraViewModel,
     onPhotoCaptured: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    val recognitions by viewModel.recognitions.collectAsState()
 
     var hasCameraPermission by remember {
         mutableStateOf(
@@ -105,6 +111,15 @@ fun CameraScreen(
                             it.surfaceProvider = previewView.surfaceProvider
                         }
 
+                        val imageAnalysis = ImageAnalysis.Builder()
+                            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                            .build()
+                            .also { analysis ->
+                                analysis.setAnalyzer(cameraExecutor, SpeciesAnalyzer(context) { results ->
+                                    viewModel.updateRecognitions(results)
+                                })
+                            }
+
                         val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
                         try {
@@ -113,7 +128,8 @@ fun CameraScreen(
                                 lifecycleOwner,
                                 cameraSelector,
                                 preview,
-                                imageCapture
+                                imageCapture,
+                                imageAnalysis
                             )
                         } catch (exc: Exception) {
                             Log.e("CameraScreen", "Use case binding failed", exc)
@@ -150,6 +166,32 @@ fun CameraScreen(
                             .clip(CircleShape)
                             .background(Color.White)
                     )
+                }
+            }
+
+            val topRecognition = recognitions.firstOrNull()
+            if (topRecognition != null) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 64.dp),
+                    contentAlignment = Alignment.TopCenter
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color(0xFF081C15).copy(alpha = 0.85f))
+                            .border(BorderStroke(1.dp, Color(0xFF40916C)), RoundedCornerShape(12.dp))
+                            .padding(horizontal = 20.dp, vertical = 10.dp)
+                    ) {
+                        val percentage = (topRecognition.confidence * 100).toInt()
+                        Text(
+                            text = "${topRecognition.title} ($percentage%)",
+                            color = Color(0xFFD8F3DC),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
         } else {

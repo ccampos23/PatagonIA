@@ -33,25 +33,31 @@ class MainActivity : ComponentActivity() {
                 var showMainApp by remember { mutableStateOf(false) }
 
                 if (showMainApp) {
+                    val cameraViewModel: com.patagonia.app.presentation.viewmodel.CameraViewModel = hiltViewModel()
                     var capturedPhotoPath by remember { mutableStateOf<String?>(null) }
+                    var captureRecognitions by remember { mutableStateOf<List<com.patagonia.app.domain.model.Recognition>>(emptyList()) }
                     
                     val path = capturedPhotoPath
                     if (path == null) {
                         CameraScreen(
+                            viewModel = cameraViewModel,
                             onPhotoCaptured = { imagePath ->
+                                captureRecognitions = cameraViewModel.recognitions.value
                                 capturedPhotoPath = imagePath
                             }
                         )
                     } else {
-                        val cameraViewModel: com.patagonia.app.presentation.viewmodel.CameraViewModel = hiltViewModel()
                         ReviewScreen(
                             imagePath = path,
-                            onSave = { name, notes ->
-                                cameraViewModel.saveCapture(name, notes, path)
+                            recognitions = captureRecognitions,
+                            onSave = { name, notes, confidence ->
+                                cameraViewModel.saveCapture(name, notes, path, confidence)
                                 capturedPhotoPath = null
+                                captureRecognitions = emptyList()
                             },
                             onRetake = {
                                 capturedPhotoPath = null
+                                captureRecognitions = emptyList()
                             }
                         )
                     }

@@ -40,9 +40,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: Implement CameraX preview in Jetpack Compose.
-- [ ] 02-02: Integrate ML Kit Image Labeling and Object Detection with frame dropping strategies.
-- [ ] 02-03: Implement Asset Manager logic for downloading ML models on-demand.
+- [x] 02-01: Initial First-Launch Model Download.
+- [ ] 02-02: CameraX Setup and Capture Flow.
+- [ ] 02-03: ML Kit Custom Model Integration.
 
 ### Phase 3: Offline Maps
 **Goal**: Overlay captures onto offline vector maps.
@@ -95,7 +95,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Local DB | 3/3 | ✅ Complete | 2026-06-14 |
-| 2. Camera & ML Kit | 0/3 | Not started | - |
+| 2. Camera & ML Kit | 1/3 | In progress | - |
 | 3. Offline Maps | 0/2 | Not started | - |
 | 4. Sync Engine & Supabase | 0/3 | Not started | - |
 | 5. Gamification & UI Polish | 0/2 | Not started | - |

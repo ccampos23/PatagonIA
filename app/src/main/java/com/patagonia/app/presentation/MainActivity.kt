@@ -17,7 +17,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.patagonia.app.presentation.theme.PatagoniaTheme
+import com.patagonia.app.presentation.ui.CameraScreen
 import com.patagonia.app.presentation.ui.LoadingScreen
+import com.patagonia.app.presentation.ui.ReviewScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -31,15 +33,27 @@ class MainActivity : ComponentActivity() {
                 var showMainApp by remember { mutableStateOf(false) }
 
                 if (showMainApp) {
-                    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(innerPadding),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(text = "PatagonIA - ¡Listo para explorar!")
-                        }
+                    var capturedPhotoPath by remember { mutableStateOf<String?>(null) }
+                    
+                    val path = capturedPhotoPath
+                    if (path == null) {
+                        CameraScreen(
+                            onPhotoCaptured = { imagePath ->
+                                capturedPhotoPath = imagePath
+                            }
+                        )
+                    } else {
+                        val cameraViewModel: com.patagonia.app.presentation.viewmodel.CameraViewModel = hiltViewModel()
+                        ReviewScreen(
+                            imagePath = path,
+                            onSave = { name, notes ->
+                                cameraViewModel.saveCapture(name, notes, path)
+                                capturedPhotoPath = null
+                            },
+                            onRetake = {
+                                capturedPhotoPath = null
+                            }
+                        )
                     }
                 } else {
                     val loadingViewModel: com.patagonia.app.presentation.viewmodel.LoadingViewModel = hiltViewModel()

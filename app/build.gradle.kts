@@ -105,6 +105,9 @@ dependencies {
     implementation("com.google.mlkit:image-labeling-custom:17.0.3")
     implementation("com.google.mlkit:image-labeling:17.0.9")
 
+    // TensorFlow Lite Core
+    implementation("org.tensorflow:tensorflow-lite:2.14.0")
+
     // Explicitly enforce 16 KB aligned graphics-path
     implementation("androidx.graphics:graphics-path:1.1.0")
 

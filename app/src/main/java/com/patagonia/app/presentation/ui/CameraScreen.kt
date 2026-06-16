@@ -9,7 +9,13 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.compose.foundation.layout.Row
-import com.google.mlkit.vision.common.InputImage
+import android.graphics.BitmapFactory
+import android.graphics.Bitmap
+import android.graphics.Matrix
+import android.media.ExifInterface
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -92,6 +98,8 @@ fun CameraScreen(
         }
     }
 
+    val coroutineScope = rememberCoroutineScope()
+
     val speciesAnalyzer = remember {
         SpeciesAnalyzer(context) { results ->
             viewModel.updateRecognitions(results)
@@ -102,18 +110,51 @@ fun CameraScreen(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri ->
             if (uri != null) {
+                Log.d("CameraScreen", "Gallery URI received: $uri")
                 val destFile = File(context.filesDir, "gallery_${System.currentTimeMillis()}.jpg")
                 if (copyUriToFile(context, uri, destFile)) {
-                    try {
-                        val inputImage = InputImage.fromFilePath(context, uri)
-                        speciesAnalyzer.analyzeStaticImage(inputImage) { results ->
-                            onPhotoCaptured(destFile.absolutePath, results)
+                    Log.d("CameraScreen", "Image copied to: ${destFile.absolutePath} (size=${destFile.length()} bytes)")
+                    
+                    // Run the analysis in a background thread to prevent UI freezing
+                    coroutineScope.launch(Dispatchers.Default) {
+                        try {
+                            val bitmap = BitmapFactory.decodeFile(destFile.absolutePath)
+                            if (bitmap != null) {
+                                // Read EXIF rotation and rotate bitmap
+                                val rotation = getExifRotation(destFile.absolutePath)
+                                val rotatedBitmap = if (rotation != 0) {
+                                    val matrix = Matrix().apply { postRotate(rotation.toFloat()) }
+                                    Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+                                } else {
+                                    bitmap
+                                }
+
+                                Log.d("CameraScreen", "Bitmap decoded successfully (exif rotation = $rotation), starting static analysis...")
+                                speciesAnalyzer.analyzeStaticImage(rotatedBitmap) { results ->
+                                    Log.d("CameraScreen", "Gallery analysis complete: ${results.size} results")
+                                    results.forEachIndexed { i, r ->
+                                        Log.d("CameraScreen", "  Result[$i]: ${r.title} (${(r.confidence * 100).toInt()}%) sci=${r.scientificName}")
+                                    }
+                                    // Ensure we navigate on the main thread for Compose state safety
+                                    ContextCompat.getMainExecutor(context).execute {
+                                        onPhotoCaptured(destFile.absolutePath, results)
+                                    }
+                                }
+                            } else {
+                                Log.e("CameraScreen", "Failed to decode bitmap from copied file")
+                                ContextCompat.getMainExecutor(context).execute {
+                                    Toast.makeText(context, "Error al procesar la imagen", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        } catch (e: Exception) {
+                            Log.e("CameraScreen", "Failed to load static image", e)
+                            ContextCompat.getMainExecutor(context).execute {
+                                Toast.makeText(context, "Error al cargar la imagen", Toast.LENGTH_SHORT).show()
+                            }
                         }
-                    } catch (e: Exception) {
-                        Log.e("CameraScreen", "Failed to load static image", e)
-                        Toast.makeText(context, "Error al cargar la imagen", Toast.LENGTH_SHORT).show()
                     }
                 } else {
+                    Log.e("CameraScreen", "Failed to copy gallery image to local storage")
                     Toast.makeText(context, "Error al procesar la imagen", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -130,12 +171,10 @@ fun CameraScreen(
         if (hasCameraPermission) {
             AndroidView(
                 factory = { ctx ->
-                    PreviewView(ctx).apply {
+                    val previewView = PreviewView(ctx).apply {
                         scaleType = PreviewView.ScaleType.FILL_CENTER
                     }
-                },
-                modifier = Modifier.fillMaxSize(),
-                update = { previewView ->
+
                     cameraProviderFuture.addListener({
                         val cameraProvider = cameraProviderFuture.get()
                         val preview = Preview.Builder().build().also {
@@ -163,8 +202,12 @@ fun CameraScreen(
                         } catch (exc: Exception) {
                             Log.e("CameraScreen", "Use case binding failed", exc)
                         }
-                    }, ContextCompat.getMainExecutor(context))
-                }
+                    }, ContextCompat.getMainExecutor(ctx))
+
+                    previewView
+                },
+                modifier = Modifier.fillMaxSize(),
+                update = { /* Unbinding and binding is handled once in factory; lifecycle owner handles pausing */ }
             )
 
             Row(
@@ -341,3 +384,23 @@ private fun copyUriToFile(context: Context, uri: android.net.Uri, destFile: File
         false
     }
 }
+
+private fun getExifRotation(filePath: String): Int {
+    return try {
+        val exif = ExifInterface(filePath)
+        val orientation = exif.getAttributeInt(
+            ExifInterface.TAG_ORIENTATION,
+            ExifInterface.ORIENTATION_NORMAL
+        )
+        when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> 90
+            ExifInterface.ORIENTATION_ROTATE_180 -> 180
+            ExifInterface.ORIENTATION_ROTATE_270 -> 270
+            else -> 0
+        }
+    } catch (e: Exception) {
+        Log.e("CameraScreen", "Failed to read EXIF orientation", e)
+        0
+    }
+}
+

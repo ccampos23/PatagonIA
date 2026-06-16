@@ -1,34 +1,33 @@
 package com.patagonia.app.data.local
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.util.Log
-import androidx.annotation.OptIn
-import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
-import com.google.mlkit.common.model.LocalModel
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.label.ImageLabeler
-import com.google.mlkit.vision.label.ImageLabeling
-import com.google.mlkit.vision.label.custom.CustomImageLabelerOptions
-import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
 import com.patagonia.app.domain.model.Recognition
+import org.tensorflow.lite.Interpreter
 import java.io.File
+import java.io.FileInputStream
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.nio.channels.FileChannel
 
 class SpeciesAnalyzer(
     private val context: Context,
     private val onResult: (List<Recognition>) -> Unit
 ) : ImageAnalysis.Analyzer {
 
-    private var labeler: ImageLabeler? = null
+    private var interpreter: Interpreter? = null
     private var labels = listOf<String>()
     private var lastAnalysisTimestamp = 0L
 
     init {
-        initializeLabeler()
+        initializeInterpreter()
     }
 
-    private fun initializeLabeler() {
+    private fun initializeInterpreter() {
         try {
             val isBundled = try {
                 context.assets.open("species_model.tflite").close()
@@ -42,52 +41,52 @@ class SpeciesAnalyzer(
                 labels = context.assets.open("species_labels.txt").bufferedReader().useLines { lines ->
                     lines.map { it.trim() }.filter { it.isNotEmpty() }.toList()
                 }
+                Log.d("SpeciesAnalyzer", "Loaded ${labels.size} species labels from assets")
 
-                val localModel = LocalModel.Builder()
-                    .setAssetFilePath("species_model.tflite")
-                    .build()
-
-                val options = CustomImageLabelerOptions.Builder(localModel)
-                    .setConfidenceThreshold(0.15f)
-                    .setMaxResultCount(3)
-                    .build()
-
-                labeler = ImageLabeling.getClient(options)
-                Log.d("SpeciesAnalyzer", "ML Kit Custom ImageLabeler initialized from assets successfully.")
+                val modelBuffer = loadModelFile(context, "species_model.tflite")
+                val options = Interpreter.Options().apply {
+                    setNumThreads(4)
+                }
+                interpreter = Interpreter(modelBuffer, options)
+                Log.d("SpeciesAnalyzer", "TFLite Interpreter initialized from assets successfully.")
             } else {
                 val modelFile = File(context.filesDir, "species_model.tflite")
                 val labelsFile = File(context.filesDir, "species_labels.txt")
 
                 if (modelFile.exists() && labelsFile.exists()) {
                     labels = labelsFile.readLines().map { it.trim() }.filter { it.isNotEmpty() }
+                    Log.d("SpeciesAnalyzer", "Loaded ${labels.size} species labels from filesDir")
 
-                    val localModel = LocalModel.Builder()
-                        .setAbsoluteFilePath(modelFile.absolutePath)
-                        .build()
-
-                    val options = CustomImageLabelerOptions.Builder(localModel)
-                        .setConfidenceThreshold(0.15f)
-                        .setMaxResultCount(3)
-                        .build()
-
-                    labeler = ImageLabeling.getClient(options)
-                    Log.d("SpeciesAnalyzer", "ML Kit Custom ImageLabeler initialized from filesDir successfully.")
+                    val modelBuffer = loadModelFromFile(modelFile)
+                    val options = Interpreter.Options().apply {
+                        setNumThreads(4)
+                    }
+                    interpreter = Interpreter(modelBuffer, options)
+                    Log.d("SpeciesAnalyzer", "TFLite Interpreter initialized from filesDir successfully.")
                 } else {
-                    Log.w("SpeciesAnalyzer", "Model or labels files missing. Falling back to default on-device labeler.")
-                    labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
+                    Log.w("SpeciesAnalyzer", "Model or labels files missing.")
                 }
             }
         } catch (e: Exception) {
-            Log.e("SpeciesAnalyzer", "Failed to initialize custom labeler, falling back to default", e)
-            try {
-                labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
-            } catch (ex: Exception) {
-                Log.e("SpeciesAnalyzer", "Failed to initialize default labeler", ex)
-            }
+            Log.e("SpeciesAnalyzer", "Failed to initialize TFLite Interpreter", e)
         }
     }
 
-    @OptIn(ExperimentalGetImage::class)
+    private fun loadModelFile(context: Context, modelName: String): java.nio.MappedByteBuffer {
+        val fileDescriptor = context.assets.openFd(modelName)
+        val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
+        val fileChannel = inputStream.channel
+        val startOffset = fileDescriptor.startOffset
+        val declaredLength = fileDescriptor.declaredLength
+        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
+    }
+
+    private fun loadModelFromFile(modelFile: File): java.nio.MappedByteBuffer {
+        val inputStream = FileInputStream(modelFile)
+        val fileChannel = inputStream.channel
+        return fileChannel.map(FileChannel.MapMode.READ_ONLY, 0, modelFile.length())
+    }
+
     override fun analyze(imageProxy: ImageProxy) {
         val currentTimestamp = System.currentTimeMillis()
         if (currentTimestamp - lastAnalysisTimestamp < 500) {
@@ -96,42 +95,19 @@ class SpeciesAnalyzer(
         }
         lastAnalysisTimestamp = currentTimestamp
 
-        val currentLabeler = labeler
-        if (currentLabeler != null) {
-            val mediaImage = imageProxy.image
-            if (mediaImage != null) {
-                val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
-                currentLabeler.process(image)
-                    .addOnSuccessListener { mlLabels ->
-                        val results = mlLabels.map { label ->
-                            val labelText = label.text
-                            val (displayName, scientificName) = try {
-                                val index = labelText.toInt()
-                                if (index in labels.indices) {
-                                    val sciName = labels[index]
-                                    Pair(SpeciesMapping.getCommonName(sciName), sciName)
-                                } else {
-                                    Pair(labelText, null)
-                                }
-                            } catch (e: NumberFormatException) {
-                                Pair(labelText, null)
-                            }
-                            Recognition(
-                                title = displayName,
-                                confidence = label.confidence,
-                                scientificName = scientificName
-                            )
-                        }
-                        onResult(results)
-                        imageProxy.close()
-                    }
-                    .addOnFailureListener { e ->
-                        Log.e("SpeciesAnalyzer", "Image classification failed, falling back to mock", e)
-                        val mockRecognitions = getMockRecognitions()
-                        onResult(mockRecognitions)
-                        imageProxy.close()
-                    }
-            } else {
+        val currentInterpreter = interpreter
+        if (currentInterpreter != null) {
+            try {
+                // Convert ImageProxy to Bitmap (available in CameraX 1.3.0+)
+                val bitmap = imageProxy.toBitmap()
+                val rotatedBitmap = rotateBitmap(bitmap, imageProxy.imageInfo.rotationDegrees)
+                val results = runInference(rotatedBitmap)
+                onResult(results)
+            } catch (e: Exception) {
+                Log.e("SpeciesAnalyzer", "Live frame inference failed, falling back to mock", e)
+                val mockRecognitions = getMockRecognitions()
+                onResult(mockRecognitions)
+            } finally {
                 imageProxy.close()
             }
         } else {
@@ -141,40 +117,96 @@ class SpeciesAnalyzer(
         }
     }
 
-    fun analyzeStaticImage(image: InputImage, onComplete: (List<Recognition>) -> Unit) {
-        val currentLabeler = labeler
-        if (currentLabeler != null) {
-            currentLabeler.process(image)
-                .addOnSuccessListener { mlLabels ->
-                    val results = mlLabels.map { label ->
-                        val labelText = label.text
-                        val (displayName, scientificName) = try {
-                            val index = labelText.toInt()
-                            if (index in labels.indices) {
-                                val sciName = labels[index]
-                                Pair(SpeciesMapping.getCommonName(sciName), sciName)
-                            } else {
-                                Pair(labelText, null)
-                            }
-                        } catch (e: NumberFormatException) {
-                            Pair(labelText, null)
-                        }
-                        Recognition(
-                            title = displayName,
-                            confidence = label.confidence,
-                            scientificName = scientificName
-                        )
-                    }
-                    onComplete(results)
+    fun analyzeStaticImage(bitmap: Bitmap, onComplete: (List<Recognition>) -> Unit) {
+        val currentInterpreter = interpreter
+        Log.d("SpeciesAnalyzer", "analyzeStaticImage called. Interpreter initialized: ${currentInterpreter != null}, Labels loaded: ${labels.size}")
+        if (currentInterpreter != null) {
+            try {
+                val results = runInference(bitmap)
+                Log.d("SpeciesAnalyzer", "Static analysis complete: ${results.size} recognitions")
+                results.forEachIndexed { idx, recognition ->
+                    Log.d("SpeciesAnalyzer", "  [$idx]: ${recognition.title} (${(recognition.confidence * 100).toInt()}%)")
                 }
-                .addOnFailureListener { e ->
-                    Log.e("SpeciesAnalyzer", "Static image classification failed", e)
-                    onComplete(emptyList())
-                }
+                onComplete(results)
+            } catch (e: Exception) {
+                Log.e("SpeciesAnalyzer", "Static image classification failed", e)
+                onComplete(emptyList())
+            }
         } else {
-            Log.e("SpeciesAnalyzer", "Labeler not initialized for static analysis")
+            Log.e("SpeciesAnalyzer", "Interpreter not initialized for static analysis")
             onComplete(emptyList())
         }
+    }
+
+    private fun rotateBitmap(bitmap: Bitmap, rotationDegrees: Int): Bitmap {
+        if (rotationDegrees == 0) return bitmap
+        val matrix = Matrix().apply { postRotate(rotationDegrees.toFloat()) }
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    }
+
+    private fun runInference(bitmap: Bitmap): List<Recognition> {
+        val currentInterpreter = interpreter ?: return emptyList()
+
+        // 1. Preprocess bitmap to ByteBuffer (shape: 1x299x299x3, float32)
+        val inputBuffer = ByteBuffer.allocateDirect(1 * 299 * 299 * 3 * 4).apply {
+            order(ByteOrder.nativeOrder())
+        }
+
+        val scaledBitmap = Bitmap.createScaledBitmap(bitmap, 299, 299, true)
+        val intValues = IntArray(299 * 299)
+        scaledBitmap.getPixels(intValues, 0, scaledBitmap.width, 0, 0, scaledBitmap.width, scaledBitmap.height)
+
+        var pixel = 0
+        for (i in 0 until 299) {
+            for (j in 0 until 299) {
+                val pixelValue = intValues[pixel++]
+
+                // Normalization: mean=127.5f, std=127.5f => maps [0, 255] to [-1f, 1f]
+                val r = (((pixelValue shr 16) and 0xFF) - 127.5f) / 127.5f
+                val g = (((pixelValue shr 8) and 0xFF) - 127.5f) / 127.5f
+                val b = ((pixelValue and 0xFF) - 127.5f) / 127.5f
+
+                inputBuffer.putFloat(r)
+                inputBuffer.putFloat(g)
+                inputBuffer.putFloat(b)
+            }
+        }
+
+        // 2. Run inference
+        val outputBuffer = Array(1) { FloatArray(24933) }
+        currentInterpreter.run(inputBuffer, outputBuffer)
+
+        // 3. Process outputs
+        val probabilities = outputBuffer[0]
+        
+        // Log top 5 raw predictions for debugging
+        val rawPredictions = probabilities.mapIndexed { idx, conf -> idx to conf }
+            .sortedByDescending { it.second }
+            .take(5)
+        Log.d("SpeciesAnalyzer", "Top 5 raw predictions from model:")
+        rawPredictions.forEachIndexed { i, (idx, conf) ->
+            val labelStr = if (idx in labels.indices) labels[idx] else "unknown"
+            Log.d("SpeciesAnalyzer", "  Rank ${i+1}: index=$idx, label='$labelStr', raw_confidence=$conf")
+        }
+
+        val recognitions = mutableListOf<Recognition>()
+        for (i in probabilities.indices) {
+            val confidence = probabilities[i]
+            if (confidence >= 0.15f) {
+                if (i in labels.indices) {
+                    val sciName = labels[i]
+                    recognitions.add(
+                        Recognition(
+                            title = SpeciesMapping.getCommonName(sciName),
+                            confidence = confidence,
+                            scientificName = sciName
+                        )
+                    )
+                }
+            }
+        }
+
+        return recognitions.sortedByDescending { it.confidence }.take(3)
     }
 
     private fun getMockRecognitions(): List<Recognition> {
@@ -187,10 +219,18 @@ class SpeciesAnalyzer(
         val timeSec = (System.currentTimeMillis() / 1000)
         val idx1 = (timeSec % mockLabelsList.size).toInt()
         val idx2 = ((timeSec + 1) % mockLabelsList.size).toInt()
-        
+
+        val sciName1 = mockLabelsList[idx1]
+        val sciName2 = mockLabelsList[idx2]
+
         return listOf(
-            Recognition(mockLabelsList[idx1], 0.82f + (Math.sin(timeSec.toDouble()) * 0.05).toFloat()),
-            Recognition(mockLabelsList[idx2], 0.12f + (Math.cos(timeSec.toDouble()) * 0.03).toFloat())
+            Recognition(SpeciesMapping.getCommonName(sciName1), 0.82f + (Math.sin(timeSec.toDouble()) * 0.05).toFloat(), sciName1),
+            Recognition(SpeciesMapping.getCommonName(sciName2), 0.12f + (Math.cos(timeSec.toDouble()) * 0.03).toFloat(), sciName2)
         )
+    }
+
+    fun close() {
+        interpreter?.close()
+        interpreter = null
     }
 }

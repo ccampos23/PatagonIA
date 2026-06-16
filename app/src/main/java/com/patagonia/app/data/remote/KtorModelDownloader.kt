@@ -11,7 +11,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import io.ktor.utils.io.jvm.javaio.toInputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.flowOn
 import java.io.File
 import javax.inject.Inject
@@ -35,15 +35,22 @@ class KtorModelDownloader @Inject constructor(
         val hasFlag = sharedPrefs.getBoolean(PREF_KEY_DOWNLOADED, false)
         val modelFile = File(context.filesDir, MODEL_FILENAME)
         val labelsFile = File(context.filesDir, LABELS_FILENAME)
-        return hasFlag && modelFile.exists() && labelsFile.exists()
+        val isBundled = try {
+            context.assets.open(MODEL_FILENAME).close()
+            context.assets.open(LABELS_FILENAME).close()
+            true
+        } catch (e: Exception) {
+            false
+        }
+        return isBundled || (hasFlag && modelFile.exists() && labelsFile.exists())
     }
 
     override fun markModelDownloaded(downloaded: Boolean) {
         sharedPrefs.edit().putBoolean(PREF_KEY_DOWNLOADED, downloaded).apply()
     }
 
-    override fun downloadModelFiles(modelUrl: String, labelsUrl: String): Flow<DownloadStatus> = flow {
-        emit(DownloadStatus.Progress(0))
+    override fun downloadModelFiles(modelUrl: String, labelsUrl: String): Flow<DownloadStatus> = channelFlow {
+        send(DownloadStatus.Progress(0))
 
         val modelFileTmp = File(context.filesDir, "$MODEL_FILENAME.tmp")
         val labelsFileTmp = File(context.filesDir, "$LABELS_FILENAME.tmp")
@@ -56,18 +63,18 @@ class KtorModelDownloader @Inject constructor(
             // 1. Download Model File (maps to 0% - 90% progress)
             downloadFileWithProgress(modelUrl, modelFileTmp) { progress ->
                 val scaledProgress = (progress * 0.9).toInt()
-                emit(DownloadStatus.Progress(scaledProgress))
+                send(DownloadStatus.Progress(scaledProgress))
             }
 
             // 2. Download Labels File (maps to 90% - 98% progress)
-            emit(DownloadStatus.Progress(90))
+            send(DownloadStatus.Progress(90))
             downloadFileWithProgress(labelsUrl, labelsFileTmp) { progress ->
                 val scaledProgress = 90 + (progress * 0.08).toInt()
-                emit(DownloadStatus.Progress(scaledProgress))
+                send(DownloadStatus.Progress(scaledProgress))
             }
 
             // 3. Verify and Rename (99% - 100% progress)
-            emit(DownloadStatus.Progress(99))
+            send(DownloadStatus.Progress(99))
             val finalModelFile = File(context.filesDir, MODEL_FILENAME)
             val finalLabelsFile = File(context.filesDir, LABELS_FILENAME)
 
@@ -76,7 +83,7 @@ class KtorModelDownloader @Inject constructor(
 
             if (modelFileTmp.renameTo(finalModelFile) && labelsFileTmp.renameTo(finalLabelsFile)) {
                 markModelDownloaded(true)
-                emit(DownloadStatus.Success)
+                send(DownloadStatus.Success)
             } else {
                 throw IllegalStateException("No se pudieron renombrar los archivos temporales a su destino final")
             }
@@ -86,7 +93,7 @@ class KtorModelDownloader @Inject constructor(
             if (modelFileTmp.exists()) modelFileTmp.delete()
             if (labelsFileTmp.exists()) labelsFileTmp.delete()
             markModelDownloaded(false)
-            emit(DownloadStatus.Error(e.localizedMessage ?: "Ocurrió un error en la descarga"))
+            send(DownloadStatus.Error(e.localizedMessage ?: "Ocurrió un error en la descarga"))
         }
     }.flowOn(Dispatchers.IO)
 
@@ -102,6 +109,10 @@ class KtorModelDownloader @Inject constructor(
                     onProgress(progress)
                 }
             }
+        }
+
+        if (response.status.value !in 200..299) {
+            throw IllegalStateException("Servidor respondió con error HTTP ${response.status.value}")
         }
         
         val inputStream = response.bodyAsChannel().toInputStream()

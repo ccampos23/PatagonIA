@@ -67,3 +67,33 @@
 - Verify CameraX preview renders smoothly and asks for permissions.
 - Verify ML Kit successfully labels frames without crashing/OOM.
 - Verify the capture -> review -> room database flow persists the image path and species data correctly.
+
+## Desviaciones del Plan y Decisiones de Implementación (Lecciones Aprendidas)
+
+Durante el desarrollo de esta fase, se realizaron varios ajustes críticos al plan original para solucionar problemas técnicos del modelo y del sistema operativo:
+
+1. **Migración a TensorFlow Lite Nativo (`org.tensorflow:tensorflow-lite`)**:
+   - *Desviación*: Se descartó la librería `com.google.mlkit:image-labeling-custom` planificada en la sección 02-03.
+   - *Razón*: El modelo `species_model.tflite` de iNaturalist carece de los metadatos de normalización obligatorios de ML Kit (`NormalizationOptions`), lo que provocaba un fallo de inicialización inmediato (`ClassifierClientCalculator failed`).
+   - *Solución*: Se implementó el preprocesamiento manual (redimensionamiento a `299x299` y normalización de píxeles a `[-1.0f, 1.0f]`) y la ejecución manual del intérprete de TFLite en [SpeciesAnalyzer.kt](file:///C:/Users/camil/Documents/antigravity/kind-kepler/app/src/main/java/com/patagonia/app/data/local/SpeciesAnalyzer.kt).
+
+2. **Sincronización (Lock) en el Intérprete**:
+   - *Desviación*: El intérprete nativo de TFLite no es seguro para hilos (`not thread-safe`).
+   - *Razón*: Al analizar imágenes concurrentemente desde la cámara en vivo (hilo del ImageAnalysis de CameraX) y desde la galería (hilo del coroutine `Dispatchers.Default`), se generaba una condición de carrera que corrompía las predicciones.
+   - *Solución*: Se añadió sincronización explícita (`synchronized(interpreterLock)`) en la llamada a `runInference()`.
+
+3. **Modelo en `assets/` y Omisión del Descargador**:
+   - *Desviación*: Se priorizó incluir los archivos `species_model.tflite` (94MB) y `species_labels.txt` (24,933 clases) directamente en la carpeta `assets/` en lugar de requerir una descarga inicial por internet (Plan 02-01).
+   - *Solución*: Se modificaron `KtorModelDownloader.kt` y `LoadingViewModel.kt` para detectar la presencia local de los assets y omitir la descarga, garantizando un funcionamiento 100% offline-first.
+
+4. **Traducción de Taxonomía y Umbrales**:
+   - *Desviación*: Se descartó el umbral estricto del 15% para no clasificar como "Especie Desconocida" (debido a la gran cantidad de clases, las confianzas se diluyen).
+   - *Solución*: Se muestran siempre las Top 3 predicciones y se añadió una capa de mapeo ([SpeciesMapping.kt](file:///C:/Users/camil/Documents/antigravity/kind-kepler/app/src/main/java/com/patagonia/app/data/local/SpeciesMapping.kt)) para traducir los nombres científicos a nombres comunes chilenos en español.
+
+5. **Corrección del Ciclo de Vida de CameraX**:
+   - *Desviación*: Vinculación de `ProcessCameraProvider` movida al bloque `factory` en lugar de `update` de Compose `AndroidView`.
+   - *Razón*: Evita re-vincular la cámara en cada recomposición del UI, eliminando el error de Binder Timeout (`TimeoutException` de 5000 ms).
+
+6. **Rotación EXIF en Galería**:
+   - *Solución*: Se implementó la lectura de la orientación EXIF de las imágenes de la galería para rotar los mapas de bits antes del análisis, evitando que imágenes en vertical se envíen inclinadas al modelo.
+

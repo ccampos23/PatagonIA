@@ -11,6 +11,7 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.label.ImageLabeler
 import com.google.mlkit.vision.label.ImageLabeling
 import com.google.mlkit.vision.label.custom.CustomImageLabelerOptions
+import com.google.mlkit.vision.label.defaults.ImageLabelerOptions
 import com.patagonia.app.domain.model.Recognition
 import java.io.File
 
@@ -29,14 +30,21 @@ class SpeciesAnalyzer(
 
     private fun initializeLabeler() {
         try {
-            val modelFile = File(context.filesDir, "species_model.tflite")
-            val labelsFile = File(context.filesDir, "species_labels.txt")
+            val isBundled = try {
+                context.assets.open("species_model.tflite").close()
+                context.assets.open("species_labels.txt").close()
+                true
+            } catch (e: Exception) {
+                false
+            }
 
-            if (modelFile.exists() && labelsFile.exists()) {
-                labels = labelsFile.readLines().map { it.trim() }.filter { it.isNotEmpty() }
+            if (isBundled) {
+                labels = context.assets.open("species_labels.txt").bufferedReader().useLines { lines ->
+                    lines.map { it.trim() }.filter { it.isNotEmpty() }.toList()
+                }
 
                 val localModel = LocalModel.Builder()
-                    .setAbsoluteFilePath(modelFile.absolutePath)
+                    .setAssetFilePath("species_model.tflite")
                     .build()
 
                 val options = CustomImageLabelerOptions.Builder(localModel)
@@ -45,12 +53,37 @@ class SpeciesAnalyzer(
                     .build()
 
                 labeler = ImageLabeling.getClient(options)
-                Log.d("SpeciesAnalyzer", "ML Kit Custom ImageLabeler initialized successfully.")
+                Log.d("SpeciesAnalyzer", "ML Kit Custom ImageLabeler initialized from assets successfully.")
             } else {
-                Log.w("SpeciesAnalyzer", "Model or labels files missing. Falling back to mock analyzer.")
+                val modelFile = File(context.filesDir, "species_model.tflite")
+                val labelsFile = File(context.filesDir, "species_labels.txt")
+
+                if (modelFile.exists() && labelsFile.exists()) {
+                    labels = labelsFile.readLines().map { it.trim() }.filter { it.isNotEmpty() }
+
+                    val localModel = LocalModel.Builder()
+                        .setAbsoluteFilePath(modelFile.absolutePath)
+                        .build()
+
+                    val options = CustomImageLabelerOptions.Builder(localModel)
+                        .setConfidenceThreshold(0.15f)
+                        .setMaxResultCount(3)
+                        .build()
+
+                    labeler = ImageLabeling.getClient(options)
+                    Log.d("SpeciesAnalyzer", "ML Kit Custom ImageLabeler initialized from filesDir successfully.")
+                } else {
+                    Log.w("SpeciesAnalyzer", "Model or labels files missing. Falling back to default on-device labeler.")
+                    labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
+                }
             }
         } catch (e: Exception) {
-            Log.e("SpeciesAnalyzer", "Failed to initialize custom labeler, falling back to mock", e)
+            Log.e("SpeciesAnalyzer", "Failed to initialize custom labeler, falling back to default", e)
+            try {
+                labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
+            } catch (ex: Exception) {
+                Log.e("SpeciesAnalyzer", "Failed to initialize default labeler", ex)
+            }
         }
     }
 
@@ -72,22 +105,30 @@ class SpeciesAnalyzer(
                     .addOnSuccessListener { mlLabels ->
                         val results = mlLabels.map { label ->
                             val labelText = label.text
-                            val displayName = try {
+                            val (displayName, scientificName) = try {
                                 val index = labelText.toInt()
-                                if (index in labels.indices) labels[index] else labelText
+                                if (index in labels.indices) {
+                                    val sciName = labels[index]
+                                    Pair(SpeciesMapping.getCommonName(sciName), sciName)
+                                } else {
+                                    Pair(labelText, null)
+                                }
                             } catch (e: NumberFormatException) {
-                                labelText
+                                Pair(labelText, null)
                             }
                             Recognition(
                                 title = displayName,
-                                confidence = label.confidence
+                                confidence = label.confidence,
+                                scientificName = scientificName
                             )
                         }
                         onResult(results)
                         imageProxy.close()
                     }
                     .addOnFailureListener { e ->
-                        Log.e("SpeciesAnalyzer", "Image classification failed", e)
+                        Log.e("SpeciesAnalyzer", "Image classification failed, falling back to mock", e)
+                        val mockRecognitions = getMockRecognitions()
+                        onResult(mockRecognitions)
                         imageProxy.close()
                     }
             } else {
@@ -97,6 +138,42 @@ class SpeciesAnalyzer(
             val mockRecognitions = getMockRecognitions()
             onResult(mockRecognitions)
             imageProxy.close()
+        }
+    }
+
+    fun analyzeStaticImage(image: InputImage, onComplete: (List<Recognition>) -> Unit) {
+        val currentLabeler = labeler
+        if (currentLabeler != null) {
+            currentLabeler.process(image)
+                .addOnSuccessListener { mlLabels ->
+                    val results = mlLabels.map { label ->
+                        val labelText = label.text
+                        val (displayName, scientificName) = try {
+                            val index = labelText.toInt()
+                            if (index in labels.indices) {
+                                val sciName = labels[index]
+                                Pair(SpeciesMapping.getCommonName(sciName), sciName)
+                            } else {
+                                Pair(labelText, null)
+                            }
+                        } catch (e: NumberFormatException) {
+                            Pair(labelText, null)
+                        }
+                        Recognition(
+                            title = displayName,
+                            confidence = label.confidence,
+                            scientificName = scientificName
+                        )
+                    }
+                    onComplete(results)
+                }
+                .addOnFailureListener { e ->
+                    Log.e("SpeciesAnalyzer", "Static image classification failed", e)
+                    onComplete(emptyList())
+                }
+        } else {
+            Log.e("SpeciesAnalyzer", "Labeler not initialized for static analysis")
+            onComplete(emptyList())
         }
     }
 

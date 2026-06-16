@@ -7,6 +7,9 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.compose.foundation.layout.Row
+import com.google.mlkit.vision.common.InputImage
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -60,7 +63,7 @@ import com.patagonia.app.presentation.viewmodel.CameraViewModel
 @Composable
 fun CameraScreen(
     viewModel: CameraViewModel,
-    onPhotoCaptured: (String) -> Unit,
+    onPhotoCaptured: (String, List<com.patagonia.app.domain.model.Recognition>) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -89,6 +92,34 @@ fun CameraScreen(
         }
     }
 
+    val speciesAnalyzer = remember {
+        SpeciesAnalyzer(context) { results ->
+            viewModel.updateRecognitions(results)
+        }
+    }
+
+    val galleryLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri ->
+            if (uri != null) {
+                val destFile = File(context.filesDir, "gallery_${System.currentTimeMillis()}.jpg")
+                if (copyUriToFile(context, uri, destFile)) {
+                    try {
+                        val inputImage = InputImage.fromFilePath(context, uri)
+                        speciesAnalyzer.analyzeStaticImage(inputImage) { results ->
+                            onPhotoCaptured(destFile.absolutePath, results)
+                        }
+                    } catch (e: Exception) {
+                        Log.e("CameraScreen", "Failed to load static image", e)
+                        Toast.makeText(context, "Error al cargar la imagen", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    Toast.makeText(context, "Error al procesar la imagen", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    )
+
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
     val imageCapture = remember { ImageCapture.Builder().build() }
     val cameraExecutor = remember { Executors.newSingleThreadExecutor() }
@@ -115,9 +146,7 @@ fun CameraScreen(
                             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                             .build()
                             .also { analysis ->
-                                analysis.setAnalyzer(cameraExecutor, SpeciesAnalyzer(context) { results ->
-                                    viewModel.updateRecognitions(results)
-                                })
+                                analysis.setAnalyzer(cameraExecutor, speciesAnalyzer)
                             }
 
                         val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
@@ -138,12 +167,35 @@ fun CameraScreen(
                 }
             )
 
-            Box(
+            Row(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 48.dp),
-                contentAlignment = Alignment.BottomCenter
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 48.dp, start = 32.dp, end = 32.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                // Botón de Galería
+                Box(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFF081C15).copy(alpha = 0.7f))
+                        .border(BorderStroke(1.5.dp, Color(0xFF40916C)), CircleShape)
+                        .clickable {
+                            galleryLauncher.launch(
+                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                            )
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "🖼",
+                        fontSize = 24.sp
+                    )
+                }
+
+                // Botón Obturador
                 Box(
                     modifier = Modifier
                         .size(80.dp)
@@ -155,7 +207,9 @@ fun CameraScreen(
                                 context = context,
                                 imageCapture = imageCapture,
                                 cameraExecutor = cameraExecutor,
-                                onPhotoCaptured = onPhotoCaptured
+                                onPhotoCaptured = { path ->
+                                    onPhotoCaptured(path, recognitions)
+                                }
                             )
                         },
                     contentAlignment = Alignment.Center
@@ -167,6 +221,9 @@ fun CameraScreen(
                             .background(Color.White)
                     )
                 }
+
+                // Spacer para balancear
+                Spacer(modifier = Modifier.size(56.dp))
             }
 
             val topRecognition = recognitions.firstOrNull()
@@ -269,4 +326,18 @@ private fun takePhoto(
             }
         }
     )
+}
+
+private fun copyUriToFile(context: Context, uri: android.net.Uri, destFile: File): Boolean {
+    return try {
+        context.contentResolver.openInputStream(uri)?.use { inputStream ->
+            destFile.outputStream().use { outputStream ->
+                inputStream.copyTo(outputStream)
+            }
+        }
+        true
+    } catch (e: Exception) {
+        Log.e("CameraScreen", "Failed to copy image URI to local file", e)
+        false
+    }
 }

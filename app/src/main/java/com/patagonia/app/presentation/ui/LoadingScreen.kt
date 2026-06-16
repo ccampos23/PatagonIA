@@ -4,6 +4,9 @@ import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -179,12 +182,29 @@ fun LoadingScreen(
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
                     Spacer(modifier = Modifier.height(24.dp))
-                    Button(
-                        onClick = { viewModel.startDownload() },
-                        colors = ButtonDefaults.buttonColors(containerColor = accentGreen),
-                        shape = RoundedCornerShape(12.dp)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(text = "Reintentar descarga", color = lightGreenText)
+                        Button(
+                            onClick = { viewModel.startDownload() },
+                            colors = ButtonDefaults.buttonColors(containerColor = accentGreen),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text(text = "Reintentar", color = lightGreenText)
+                        }
+
+                        Spacer(modifier = Modifier.width(12.dp))
+
+                        Button(
+                            onClick = onDownloadComplete,
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B4332)),
+                            border = BorderStroke(1.dp, Color(0xFF40916C)),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text(text = "Usar sin internet", color = lightGreenSub)
+                        }
                     }
                 }
             }

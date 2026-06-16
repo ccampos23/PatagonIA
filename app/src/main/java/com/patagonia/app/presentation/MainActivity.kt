@@ -41,8 +41,8 @@ class MainActivity : ComponentActivity() {
                     if (path == null) {
                         CameraScreen(
                             viewModel = cameraViewModel,
-                            onPhotoCaptured = { imagePath ->
-                                captureRecognitions = cameraViewModel.recognitions.value
+                            onPhotoCaptured = { imagePath, results ->
+                                captureRecognitions = results
                                 capturedPhotoPath = imagePath
                             }
                         )
@@ -50,8 +50,8 @@ class MainActivity : ComponentActivity() {
                         ReviewScreen(
                             imagePath = path,
                             recognitions = captureRecognitions,
-                            onSave = { name, notes, confidence ->
-                                cameraViewModel.saveCapture(name, notes, path, confidence)
+                            onSave = { name, scientificName, notes, confidence ->
+                                cameraViewModel.saveCapture(name, scientificName, notes, path, confidence)
                                 capturedPhotoPath = null
                                 captureRecognitions = emptyList()
                             },

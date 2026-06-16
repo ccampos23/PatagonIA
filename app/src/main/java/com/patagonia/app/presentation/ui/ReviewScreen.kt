@@ -43,6 +43,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.patagonia.app.data.local.SpeciesMapping
 import com.patagonia.app.domain.model.Recognition
 import java.io.File
 
@@ -50,14 +51,14 @@ import java.io.File
 fun ReviewScreen(
     imagePath: String,
     recognitions: List<Recognition>,
-    onSave: (String, String?, Float?) -> Unit,
+    onSave: (String, String?, String?, Float?) -> Unit,
     onRetake: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val topRecognition = remember(recognitions) { recognitions.firstOrNull() }
     
-    var speciesName by remember { mutableStateOf(topRecognition?.title ?: "") }
+    var speciesName by remember { mutableStateOf(topRecognition?.title ?: "Especie Desconocida") }
     var notes by remember { mutableStateOf("") }
     var showDetails by remember { mutableStateOf(false) }
 
@@ -251,7 +252,12 @@ fun ReviewScreen(
                 Button(
                     onClick = {
                         if (speciesName.isNotBlank()) {
-                            onSave(speciesName, notes.ifBlank { null }, topRecognition?.confidence)
+                            val matchedSciName = if (speciesName.trim() == topRecognition?.title) {
+                                topRecognition.scientificName
+                            } else {
+                                SpeciesMapping.getScientificName(speciesName)
+                            }
+                            onSave(speciesName, matchedSciName, notes.ifBlank { null }, topRecognition?.confidence)
                         }
                     },
                     enabled = speciesName.isNotBlank(),

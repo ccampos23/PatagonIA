@@ -25,7 +25,7 @@ class CameraViewModel @Inject constructor(
         _recognitions.value = newRecognitions
     }
 
-    fun saveCapture(speciesName: String, notes: String?, imagePath: String, confidence: Float? = null) {
+    fun saveCapture(speciesName: String, scientificName: String?, notes: String?, imagePath: String, confidence: Float? = null) {
         viewModelScope.launch {
             val captureId = UUID.randomUUID().toString()
             val timestamp = System.currentTimeMillis()
@@ -36,7 +36,7 @@ class CameraViewModel @Inject constructor(
             val capture = Capture(
                 id = captureId,
                 speciesName = speciesName.trim(),
-                scientificName = getScientificNamePlaceholder(speciesName),
+                scientificName = scientificName?.trim() ?: "Species indet.",
                 timestamp = timestamp,
                 imagePath = imagePath,
                 latitude = mockLatitude,
@@ -48,18 +48,6 @@ class CameraViewModel @Inject constructor(
             )
 
             addCaptureUseCase(capture)
-        }
-    }
-
-    private fun getScientificNamePlaceholder(species: String): String {
-        return when (species.lowercase().trim()) {
-            "huemul" -> "Hippocamelus bisulcus"
-            "condor", "cóndor" -> "Vultur gryphus"
-            "puma" -> "Puma concolor"
-            "guanaco" -> "Lama guanicoe"
-            "coihue" -> "Nothofagus dombeyi"
-            "araucaria" -> "Araucaria araucana"
-            else -> "Species indet."
         }
     }
 }

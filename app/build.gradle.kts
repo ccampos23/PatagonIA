@@ -42,6 +42,16 @@ android {
     buildFeatures {
         compose = true
     }
+
+    packaging {
+        jniLibs {
+            useLegacyPackaging = false
+        }
+    }
+
+    androidResources {
+        noCompress.add("tflite")
+    }
 }
 
 dependencies {
@@ -92,7 +102,11 @@ dependencies {
     implementation("androidx.camera:camera-view:$cameraVersion")
 
     // ML Kit Custom Model Labeling
-    implementation("com.google.mlkit:image-labeling-custom:17.0.2")
+    implementation("com.google.mlkit:image-labeling-custom:17.0.3")
+    implementation("com.google.mlkit:image-labeling:17.0.9")
+
+    // Explicitly enforce 16 KB aligned graphics-path
+    implementation("androidx.graphics:graphics-path:1.1.0")
 
     // Testing
     testImplementation("junit:junit:4.13.2")

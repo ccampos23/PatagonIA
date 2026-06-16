@@ -22,6 +22,7 @@ class SpeciesAnalyzer(
     private var interpreter: Interpreter? = null
     private var labels = listOf<String>()
     private var lastAnalysisTimestamp = 0L
+    private val interpreterLock = Any()
 
     init {
         initializeInterpreter()
@@ -147,6 +148,10 @@ class SpeciesAnalyzer(
     private fun runInference(bitmap: Bitmap): List<Recognition> {
         val currentInterpreter = interpreter ?: return emptyList()
 
+        // Synchronize access: TFLite Interpreter is NOT thread-safe.
+        // Camera (analyzer thread) and gallery (coroutine thread) must not run concurrently.
+        return synchronized(interpreterLock) {
+
         // 1. Preprocess bitmap to ByteBuffer (shape: 1x299x299x3, float32)
         val inputBuffer = ByteBuffer.allocateDirect(1 * 299 * 299 * 3 * 4).apply {
             order(ByteOrder.nativeOrder())
@@ -189,24 +194,22 @@ class SpeciesAnalyzer(
             Log.d("SpeciesAnalyzer", "  Rank ${i+1}: index=$idx, label='$labelStr', raw_confidence=$conf")
         }
 
-        val recognitions = mutableListOf<Recognition>()
-        for (i in probabilities.indices) {
-            val confidence = probabilities[i]
-            if (confidence >= 0.15f) {
-                if (i in labels.indices) {
-                    val sciName = labels[i]
-                    recognitions.add(
-                        Recognition(
-                            title = SpeciesMapping.getCommonName(sciName),
-                            confidence = confidence,
-                            scientificName = sciName
-                        )
-                    )
-                }
-            }
-        }
+        // Always return top 3 results. With 24933 classes, even 2% confidence is very significant.
+        val topIndices = probabilities.indices
+            .sortedByDescending { probabilities[it] }
+            .take(3)
 
-        return recognitions.sortedByDescending { it.confidence }.take(3)
+        topIndices.mapNotNull { i ->
+            if (i in labels.indices) {
+                val sciName = labels[i]
+                Recognition(
+                    title = SpeciesMapping.getCommonName(sciName),
+                    confidence = probabilities[i],
+                    scientificName = sciName
+                )
+            } else null
+        }
+        } // end synchronized
     }
 
     private fun getMockRecognitions(): List<Recognition> {

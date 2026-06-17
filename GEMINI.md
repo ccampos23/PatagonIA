@@ -123,6 +123,8 @@ Use these entry points:
 - `/gsd-execute-phase` for planned phase work
 
 Do not make direct repo edits outside a GSD workflow unless the user explicitly asks to bypass it.
+
+- **TDD Enforcement**: You MUST follow a strict Test-Driven Development (TDD) cycle (RED -> GREEN -> REFACTOR) using the loaded `tdd` and `android-testing-unit` skills for all feature and bug-fixing tasks. Write tests describing behavior first, run to confirm they fail, write implementation to pass, and verify via automated unit tests.
 <!-- GSD:workflow-end -->
 
 <!-- GSD:profile-start -->

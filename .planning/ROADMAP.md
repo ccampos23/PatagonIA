@@ -8,7 +8,7 @@ PataGOnIA is an interactive offline-first nature journal Android application. Th
 
 - [x] **Phase 1: Foundation & Local DB** - Establish the single source of truth using Room and Clean Architecture.
 - [x] **Phase 2: Camera & ML Kit Integration** - Implement real-time on-device species recognition.
-- [ ] **Phase 3: Offline Maps** - Integrate MapLibre Compose and regional asset downloading.
+- [ ] **Phase 3: Offline Maps** - Integrate Mapbox Maps SDK for Android (Compose) and regional asset downloading.
 - [ ] **Phase 4: Sync Engine & Supabase** - Build bidirectional synchronization using WorkManager.
 - [ ] **Phase 5: Gamification & UI Polish** - Build the Sticker Book and Two-Tier reward system.
 
@@ -49,13 +49,13 @@ Plans:
 **Depends on**: Phase 2
 **Requirements**: REQ-CORE-01, REQ-CORE-04
 **Success Criteria** (what must be TRUE):
-  1. MapLibre Compose map renders on the UI.
+  1. Mapbox MapView/MapboxMap renders on the Compose UI.
   2. Users can download specific regional tile and style packs for offline use.
   3. Captures are plotted as pins on the offline map.
 **Plans**: 2 plans
 
 Plans:
-- [ ] 03-01: Integrate MapLibre Compose and configure local tile rendering.
+- [ ] 03-01: Integrate Mapbox Maps SDK and configure local tile rendering.
 - [ ] 03-02: Build UI for Asset Manager to download offline trail maps.
 
 ### Phase 4: Sync Engine & Supabase

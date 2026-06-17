@@ -1,11 +1,26 @@
 {
   "version": 1,
   "skills": {
+    "android-architecture-clean": {
+      "source": "krutikJain/android-agent-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "36442c8502d91da49ffe0838391eff59207fe50ca152204b8387e700938eab78"
+    },
     "android-clean-architecture": {
       "source": "affaan-m/everything-claude-code",
       "sourceType": "github",
       "skillPath": "skills/android-clean-architecture/SKILL.md",
       "computedHash": "877b63dfe31ec4d864c0a09ead442029a236def32fd2a7fd374083a27b4fa5ba"
+    },
+    "android-compose-foundations": {
+      "source": "krutikJain/android-agent-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "2fa62193bee29d68015b18b6473c1eb5db5618ed9d0209301259a0bb3f26d7e5"
+    },
+    "android-coroutines-flow": {
+      "source": "krutikJain/android-agent-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "373c0ed1eb6fe061d38ac8ceee04bdb9380c4862596d5515984d5768a85d1aaf"
     },
     "android-di-hilt": {
       "source": "krutikjain/android-agent-skills",
@@ -13,11 +28,41 @@
       "skillPath": "skills/android-di-hilt/SKILL.md",
       "computedHash": "a0318bcae54ab4e4ecca71a596292711b92535f3f2a6a5cd71573884ea18167a"
     },
+    "android-gradle-build-logic": {
+      "source": "krutikJain/android-agent-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "a06680cd5c497a398b341e1ac00a2998e76b353efaae2218c8ab1762b2fb8f5c"
+    },
+    "android-kotlin-core": {
+      "source": "krutikJain/android-agent-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "0a510e8fc8e64eb8ea1d2042a79a07f92eb10bf9b4f8461deea5cff4b745966a"
+    },
+    "android-networking-retrofit-okhttp": {
+      "source": "krutikJain/android-agent-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "8cb3647f71f6904752a1681eb575ea1fda35cf7d769834b4034b9f52ac0d146e"
+    },
+    "android-testing-unit": {
+      "source": "krutikJain/android-agent-skills",
+      "sourceType": "autoskills-registry",
+      "computedHash": "7848ad8738bc5a20458ff3b60a520aae13d509c097354dfa07244952c7472bcd"
+    },
     "imagegen-frontend-mobile": {
       "source": "leonxlnx/taste-skill",
       "sourceType": "github",
       "skillPath": "skills/imagegen-frontend-mobile/SKILL.md",
       "computedHash": "9ab7f4f6ce66a3cff02bbf5894e5bd5af50bf5d6ef0adffdc88e8fab772fe44f"
+    },
+    "java-coding-standards": {
+      "source": "affaan-m/everything-claude-code",
+      "sourceType": "autoskills-registry",
+      "computedHash": "1c417544249186f66c1110e7812e5bee4402ae5012442847b287b4d6e6dd9c55"
+    },
+    "java-docs": {
+      "source": "github/awesome-copilot",
+      "sourceType": "autoskills-registry",
+      "computedHash": "966d266801cce0b8d9039cb77a85249e8f318148be5ae5cbac09e45175b7fe5e"
     },
     "kotlin-springboot": {
       "source": "github/awesome-copilot",
@@ -36,6 +81,12 @@
       "sourceType": "github",
       "skillPath": "skills/supabase/SKILL.md",
       "computedHash": "d414d598b9428b3e851c4ce61898649906b19e55aa7415bb42a286bd9ca2ab32"
+    },
+    "tdd": {
+      "source": "mattpocock/skills",
+      "sourceType": "github",
+      "skillPath": "skills/engineering/tdd/SKILL.md",
+      "computedHash": "15a7b5e36383ebadb2dec5e586679e55e9663d292da418926b8da6fc0ef27d84"
     }
   }
 }

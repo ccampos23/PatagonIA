@@ -12,7 +12,7 @@
 ## Active Requirements (v1)
 
 ### Core User Experience (MAP/ML)
-- [ ] REQ-CORE-01: **Interactive Offline Map:** Integration of MapLibre Compose for rendering offline vector tiles and trails.
+- [ ] REQ-CORE-01: **Interactive Offline Map:** Integration of Mapbox Maps SDK for Android (Compose) for rendering offline vector tiles and trails.
 - [ ] REQ-CORE-02: **On-Device ML Camera:** Real-time species recognition using CameraX and ML Kit Vision with `STRATEGY_KEEP_ONLY_LATEST`.
 - [ ] REQ-CORE-03: **Local-First Capture Journal:** Captures are instantly saved locally via Room database and marked as pending sync.
 - [ ] REQ-CORE-04: **First-Launch Asset Sync:** Download all required ML models and species wikis automatically on the first launch, blocking the app until complete to ensure 100% offline reliability.

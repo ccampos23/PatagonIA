@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -18,6 +20,15 @@ android {
         versionName = "0.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Mapbox Access Token from local.properties (D-09)
+        val properties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            properties.load(localPropertiesFile.inputStream())
+        }
+        val mapboxToken = properties.getProperty("MAPBOX_ACCESS_TOKEN") ?: ""
+        buildConfigField("String", "MAPBOX_ACCESS_TOKEN", "\"$mapboxToken\"")
     }
 
     buildTypes {
@@ -41,6 +52,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     packaging {
@@ -110,6 +122,10 @@ dependencies {
 
     // Explicitly enforce 16 KB aligned graphics-path
     implementation("androidx.graphics:graphics-path:1.1.0")
+
+    // Mapbox Maps SDK for Android
+    implementation("com.mapbox.maps:android:11.11.1")
+    implementation("com.mapbox.extension:maps-compose:11.11.1")
 
     // Testing
     testImplementation("junit:junit:4.13.2")

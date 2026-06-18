@@ -1,0 +1,65 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Sendero Base Torres",
+        "difficulty": "Difficult",
+        "id": "trail-base-torres"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-72.9544, -50.9422],
+          [-72.9510, -50.9395],
+          [-72.9455, -50.9370],
+          [-72.9400, -50.9340],
+          [-72.9365, -50.9310],
+          [-72.9330, -50.9280],
+          [-72.9280, -50.9250],
+          [-72.9230, -50.9215],
+          [-72.9190, -50.9180]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Sendero Valle del Francés",
+        "difficulty": "Moderate",
+        "id": "trail-valle-frances"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-73.0150, -50.9600],
+          [-73.0120, -50.9565],
+          [-73.0080, -50.9530],
+          [-73.0040, -50.9495],
+          [-73.0010, -50.9460],
+          [-72.9975, -50.9425],
+          [-72.9940, -50.9390]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Sendero Lago Grey",
+        "difficulty": "Easy",
+        "id": "trail-lago-grey"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-73.1100, -51.0200],
+          [-73.1060, -51.0170],
+          [-73.1020, -51.0140],
+          [-73.0980, -51.0110],
+          [-73.0940, -51.0080]
+        ]
+      }
+    }
+  ]
+}

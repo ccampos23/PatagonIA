@@ -129,6 +129,7 @@ dependencies {
     // implementation("com.mapbox.extension:maps-compose:11.11.1")
 
     // Testing
+    testImplementation("org.json:json:20231013")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
     testImplementation("app.cash.turbine:turbine:1.2.0")

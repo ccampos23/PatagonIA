@@ -1,7 +1,9 @@
 package com.patagonia.app.data.di
 
 import com.patagonia.app.data.repository.CaptureRepositoryImpl
+import com.patagonia.app.data.repository.TileDownloadRepositoryImpl
 import com.patagonia.app.domain.repository.CaptureRepository
+import com.patagonia.app.domain.repository.TileDownloadRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -17,4 +19,11 @@ abstract class RepositoryModule {
     abstract fun bindCaptureRepository(
         impl: CaptureRepositoryImpl
     ): CaptureRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindTileDownloadRepository(
+        impl: TileDownloadRepositoryImpl
+    ): TileDownloadRepository
 }
+

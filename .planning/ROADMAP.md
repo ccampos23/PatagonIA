@@ -67,7 +67,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 03-01: Integrate Mapbox Maps SDK and configure local tile rendering.
+- [x] 03-01: Integrate Mapbox Maps SDK and configure local tile rendering.
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -119,6 +119,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Foundation & Local DB | 3/3 | ✅ Complete | 2026-06-14 |
 | 2. Camera & ML Kit | 3/3 | ✅ Complete | 2026-06-15 |
-| 3. Offline Maps | 0/2 | Not started | - |
+| 3. Offline Maps | 1/3 | In Progress|  |
 | 4. Sync Engine & Supabase | 0/3 | Not started | - |
 | 5. Gamification & UI Polish | 0/2 | Not started | - |

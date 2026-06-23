@@ -1,0 +1,30 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-06-20T00:13:13.460Z",
+  "phase": "03",
+  "phase_name": "offline-maps",
+  "phase_dir": ".planning/phases/03-offline-maps",
+  "plan": 2,
+  "task": 2,
+  "total_tasks": 2,
+  "status": "paused",
+  "completed_tasks": [
+    {"id": 1, "name": "Task 1: Offline Map Downloader Service", "status": "done", "commit": "c236e34"}
+  ],
+  "remaining_tasks": [
+    {"id": 2, "name": "Task 2: Asset Manager Screen", "status": "not_started"}
+  ],
+  "blockers": [
+    {"description": "Mapbox API token is missing, so Mapbox SDK dependencies are commented out and placeholders are used in code.", "type": "technical", "workaround": "Implement UI and Service logic with mocks/placeholders until token is configured."}
+  ],
+  "human_actions_pending": [],
+  "decisions": [
+    {"decision": "Use org.json:json test dependency", "rationale": "Allows running unit tests for TrailGeoJsonParser on JVM without stubbed org.json throwing RuntimeExceptions.", "phase": "03"}
+  ],
+  "uncommitted_files": [
+    "app/src/main/java/com/patagonia/app/presentation/viewmodel/AssetManagerUiState.kt",
+    "app/src/test/java/com/patagonia/app/presentation/viewmodel/AssetManagerViewModelTest.kt"
+  ],
+  "next_action": "Implement AssetManagerViewModel.kt to pass the AssetManagerViewModelTest.kt unit tests.",
+  "context_notes": "We successfully implemented and tested the foreground downloading service (TileDownloadService) with background retries, Chilean presets, and notifications. Now we need to implement the AssetManagerViewModel and AssetManagerScreen composable to let the user select parks or custom bounding boxes, verify size limits (<100MB warning, <750k tiles block), and trigger the service."
+}

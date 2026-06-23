@@ -125,8 +125,8 @@ dependencies {
 
     // Mapbox Maps SDK for Android
     // NOTE: Uncomment when MAPBOX_DOWNLOADS_TOKEN is set to a real secret token in gradle.properties
-    // implementation("com.mapbox.maps:android:11.11.1")
-    // implementation("com.mapbox.extension:maps-compose:11.11.1")
+    implementation("com.mapbox.maps:android:11.11.1")
+    implementation("com.mapbox.extension:maps-compose:11.11.1")
 
     // Testing
     testImplementation("org.json:json:20231013")

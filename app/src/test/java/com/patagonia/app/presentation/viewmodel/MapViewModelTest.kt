@@ -111,4 +111,59 @@ class MapViewModelTest {
         assertEquals(1, state.captures.size)
         assertEquals("Puma", state.captures[0].speciesName)
     }
+
+    @Test
+    fun `initial state has no selected capture`() = runTest {
+        val state = viewModel.uiState.value
+        assertEquals(null, state.selectedCapture)
+        assertEquals(false, state.isTooltipVisible)
+    }
+
+    @Test
+    fun `selectCapture sets selectedCapture and tooltip visible`() = runTest {
+        val capture = Capture(
+            id = "1",
+            speciesName = "Huemul",
+            scientificName = "Hippocamelus bisulcus",
+            timestamp = System.currentTimeMillis(),
+            imagePath = "/test/huemul.jpg",
+            latitude = -48.0,
+            longitude = -72.5,
+            altitude = 800.0,
+            confidence = 0.88f,
+            notes = null,
+            isSynced = false
+        )
+
+        viewModel.selectCapture(capture)
+        val state = viewModel.uiState.value
+        assertEquals(capture, state.selectedCapture)
+        assertTrue(state.isTooltipVisible)
+    }
+
+    @Test
+    fun `dismissTooltip clears selectedCapture`() = runTest {
+        val capture = Capture(
+            id = "2",
+            speciesName = "Condor",
+            scientificName = "Vultur gryphus",
+            timestamp = System.currentTimeMillis(),
+            imagePath = "/test/condor.jpg",
+            latitude = -33.4,
+            longitude = -70.6,
+            altitude = 3000.0,
+            confidence = 0.95f,
+            notes = null,
+            isSynced = false
+        )
+
+        viewModel.selectCapture(capture)
+        assertTrue(viewModel.uiState.value.isTooltipVisible)
+
+        viewModel.dismissTooltip()
+        val state = viewModel.uiState.value
+        assertEquals(null, state.selectedCapture)
+        assertEquals(false, state.isTooltipVisible)
+    }
 }
+

@@ -48,4 +48,18 @@ class MapViewModel @Inject constructor(
     fun toggleCompassOrientation() {
         _uiState.update { it.copy(isNorthUp = !it.isNorthUp) }
     }
+
+    /**
+     * Select a capture to show its tooltip popup on the map (D-23).
+     */
+    fun selectCapture(capture: com.patagonia.app.domain.model.Capture) {
+        _uiState.update { it.copy(selectedCapture = capture) }
+    }
+
+    /**
+     * Dismiss the currently visible tooltip popup.
+     */
+    fun dismissTooltip() {
+        _uiState.update { it.copy(selectedCapture = null) }
+    }
 }

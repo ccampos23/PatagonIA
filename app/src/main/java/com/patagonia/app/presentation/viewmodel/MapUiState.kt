@@ -1,5 +1,7 @@
 package com.patagonia.app.presentation.viewmodel
 
+import com.patagonia.app.domain.model.Capture
+
 /**
  * Represents the UI state for the map screen.
  */
@@ -13,12 +15,17 @@ data class MapUiState(
     /** Default zoom level */
     val cameraZoom: Double = DEFAULT_ZOOM,
     /** List of captures to display as pins */
-    val captures: List<com.patagonia.app.domain.model.Capture> = emptyList(),
+    val captures: List<Capture> = emptyList(),
     /** Whether the map is showing the user's journal or global sightings (D-20) */
     val showMyJournal: Boolean = true,
     /** Compass orientation mode (D-12) */
-    val isNorthUp: Boolean = true
+    val isNorthUp: Boolean = true,
+    /** Currently selected capture for tooltip popup (D-23), null when no tooltip shown */
+    val selectedCapture: Capture? = null
 ) {
+    /** Whether a tooltip popup should be displayed */
+    val isTooltipVisible: Boolean get() = selectedCapture != null
+
     companion object {
         const val OUTDOORS_STYLE_URI = "mapbox://styles/mapbox/outdoors-v12"
         // Central Chile coordinates
@@ -27,3 +34,4 @@ data class MapUiState(
         const val DEFAULT_ZOOM = 6.0
     }
 }
+

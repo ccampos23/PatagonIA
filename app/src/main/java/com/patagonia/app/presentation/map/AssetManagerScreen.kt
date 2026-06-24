@@ -15,9 +15,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -41,21 +40,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.patagonia.app.domain.model.DownloadedRegion
 import com.patagonia.app.domain.model.ParkRegionPreset
 import com.patagonia.app.domain.model.TileDownloadState
+import com.patagonia.app.presentation.theme.extendedColors
 import com.patagonia.app.presentation.viewmodel.AssetManagerUiState
 import com.patagonia.app.presentation.viewmodel.AssetManagerViewModel
-
-// Colors from 03-UI-SPEC.md
-private val PrimaryGreen = Color(0xFF2E7D32)
-private val ErrorRed = Color(0xFFB3261E)
-private val LightBackground = Color(0xFFF5F5F0)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,7 +65,7 @@ fun AssetManagerScreen(
                 title = { Text("Gestor de Mapas Sin Conexión") },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -95,7 +88,7 @@ fun AssetManagerScreen(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
-                .background(LightBackground)
+                .background(MaterialTheme.colorScheme.background)
         )
     }
 }
@@ -205,7 +198,7 @@ fun ActiveDownloadCard(
                     LinearProgressIndicator(
                         progress = { state.progressPercent / 100f },
                         modifier = Modifier.fillMaxWidth(),
-                        color = PrimaryGreen
+                        color = MaterialTheme.colorScheme.primary
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
@@ -216,14 +209,14 @@ fun ActiveDownloadCard(
                     Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
                         Button(
                             onClick = { onPause(state.regionId) },
-                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen)
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                         ) {
                             Text("Pausar")
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                         Button(
                             onClick = { onCancel(state.regionId) },
-                            colors = ButtonDefaults.buttonColors(containerColor = ErrorRed)
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                         ) {
                             Text("Cancelar")
                         }
@@ -239,14 +232,14 @@ fun ActiveDownloadCard(
                     Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
                         Button(
                             onClick = { onResume(state.regionId) },
-                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen)
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                         ) {
                             Text("Reanudar")
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                         Button(
                             onClick = { onCancel(state.regionId) },
-                            colors = ButtonDefaults.buttonColors(containerColor = ErrorRed)
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                         ) {
                             Text("Cancelar")
                         }
@@ -256,19 +249,19 @@ fun ActiveDownloadCard(
                     Text(
                         text = "Error de descarga: ${state.regionName}",
                         style = MaterialTheme.typography.titleMedium,
-                        color = ErrorRed,
+                        color = MaterialTheme.colorScheme.error,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Download failed. Please check your connection and retry.",
+                        text = "No se pudo completar la descarga. Revisa tu conexión e inténtalo nuevamente.",
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Button(
                         onClick = { onCancel(state.regionId) },
                         modifier = Modifier.align(Alignment.End),
-                        colors = ButtonDefaults.buttonColors(containerColor = ErrorRed)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                     ) {
                         Text("Cerrar")
                     }
@@ -277,7 +270,7 @@ fun ActiveDownloadCard(
                     Text(
                         text = "Descarga detenida (Límite de tiempo): ${state.regionName}",
                         style = MaterialTheme.typography.titleMedium,
-                        color = ErrorRed,
+                        color = MaterialTheme.colorScheme.error,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(4.dp))
@@ -289,14 +282,14 @@ fun ActiveDownloadCard(
                     Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
                         Button(
                             onClick = { onResume(state.regionId) },
-                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen)
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                         ) {
                             Text("Reanudar")
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                         Button(
                             onClick = { onCancel(state.regionId) },
-                            colors = ButtonDefaults.buttonColors(containerColor = ErrorRed)
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                         ) {
                             Text("Cerrar")
                         }
@@ -371,12 +364,12 @@ fun CustomDownloadCard(
                     modifier = Modifier.padding(top = 12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.Warning, contentDescription = "Warning", tint = Color(0xFFE65100))
+                    Icon(Icons.Default.Warning, contentDescription = "Advertencia", tint = MaterialTheme.extendedColors.warning)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = uiState.validationWarning ?: "",
                         style = MaterialTheme.typography.bodySmall,
-                        color = Color(0xFFE65100)
+                        color = MaterialTheme.extendedColors.warning
                     )
                 }
             }
@@ -386,12 +379,12 @@ fun CustomDownloadCard(
                     modifier = Modifier.padding(top = 12.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(Icons.Default.Warning, contentDescription = "Error", tint = ErrorRed)
+                    Icon(Icons.Default.Warning, contentDescription = "Error", tint = MaterialTheme.colorScheme.error)
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = uiState.validationError ?: "",
                         style = MaterialTheme.typography.bodySmall,
-                        color = ErrorRed
+                        color = MaterialTheme.colorScheme.error
                     )
                 }
             }
@@ -403,10 +396,10 @@ fun CustomDownloadCard(
                 enabled = uiState.validationError == null && !uiState.isDownloading &&
                         uiState.west.isNotBlank() && uiState.south.isNotBlank() &&
                         uiState.east.isNotBlank() && uiState.north.isNotBlank(),
-                colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("Download Region")
+                Text("Descargar región")
             }
         }
     }
@@ -435,13 +428,13 @@ fun PresetParkCard(
                 Text(
                     text = "${preset.region} • ~${preset.estimatedSizeMB} MB",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             Button(
                 onClick = onDownloadClick,
                 enabled = !isDownloading,
-                colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen)
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
             ) {
                 Text("Descargar")
             }
@@ -462,16 +455,15 @@ fun EmptyStateCard() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "No Regions Downloaded",
+                text = "Aún no hay mapas descargados",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Download a region to use the map offline without internet.",
+                text = "Descarga una región para usar el mapa sin conexión.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray,
-                lineHeight = 20.sp
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
@@ -502,28 +494,28 @@ fun DownloadedRegionCard(
                     Text(
                         text = String.format("%.1f MB", region.sizeMB),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Gray
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 IconButton(onClick = { showDeleteConfirm = true }) {
-                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = ErrorRed)
+                    Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = MaterialTheme.colorScheme.error)
                 }
             }
 
             AnimatedVisibility(visible = showDeleteConfirm) {
                 Column(modifier = Modifier.padding(top = 12.dp)) {
                     Text(
-                        text = "Delete Region: Are you sure you want to delete this offline region? You can always download it again.",
+                        text = "¿Eliminar este mapa sin conexión? Puedes volver a descargarlo cuando quieras.",
                         style = MaterialTheme.typography.bodySmall,
-                        color = ErrorRed
+                        color = MaterialTheme.colorScheme.error
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
                         Button(
                             onClick = { showDeleteConfirm = false },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                         ) {
-                            Text("Cancelar")
+                            Text("Cancelar", color = MaterialTheme.colorScheme.onSurfaceVariant)
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                         Button(
@@ -531,7 +523,7 @@ fun DownloadedRegionCard(
                                 onDeleteClick()
                                 showDeleteConfirm = false
                             },
-                            colors = ButtonDefaults.buttonColors(containerColor = ErrorRed)
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                         ) {
                             Text("Confirmar")
                         }

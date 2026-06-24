@@ -20,10 +20,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -42,7 +45,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.patagonia.app.data.local.SpeciesMapping
 import com.patagonia.app.domain.model.Recognition
 import java.io.File
@@ -57,15 +59,12 @@ fun ReviewScreen(
 ) {
     val context = LocalContext.current
     val topRecognition = remember(recognitions) { recognitions.firstOrNull() }
-    
+    val colors = MaterialTheme.colorScheme
+    val type = MaterialTheme.typography
+
     var speciesName by remember { mutableStateOf(topRecognition?.title ?: "Especie Desconocida") }
     var notes by remember { mutableStateOf("") }
     var showDetails by remember { mutableStateOf(false) }
-
-    val darkGreenBg = Color(0xFF081C15)
-    val lightGreenText = Color(0xFFD8F3DC)
-    val accentGreen = Color(0xFF40916C)
-    val lightGreenSub = Color(0xFF95D5B2)
 
     val bitmap = remember(imagePath) {
         BitmapFactory.decodeFile(imagePath)?.asImageBitmap()
@@ -73,7 +72,7 @@ fun ReviewScreen(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        containerColor = darkGreenBg
+        containerColor = colors.background
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -85,9 +84,8 @@ fun ReviewScreen(
         ) {
             Text(
                 text = "Revisar Avistamiento",
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold,
-                color = lightGreenText,
+                style = type.headlineSmall,
+                color = colors.onSurface,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
@@ -95,8 +93,8 @@ fun ReviewScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(280.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(Color(0xFF1B4332)),
+                    .clip(MaterialTheme.shapes.large)
+                    .background(colors.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
                 if (bitmap != null) {
@@ -109,8 +107,8 @@ fun ReviewScreen(
                 } else {
                     Text(
                         text = "No se pudo cargar la imagen",
-                        color = Color.LightGray,
-                        fontSize = 14.sp
+                        color = colors.onSurfaceVariant,
+                        style = type.bodyMedium
                     )
                 }
             }
@@ -127,14 +125,15 @@ fun ReviewScreen(
                     label = { Text("Nombre de la Especie") },
                     modifier = Modifier.weight(1f),
                     singleLine = true,
-                    shape = RoundedCornerShape(12.dp),
+                    shape = MaterialTheme.shapes.medium,
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = accentGreen,
-                        unfocusedBorderColor = Color(0xFF1B4332),
-                        focusedLabelColor = lightGreenSub,
-                        unfocusedLabelColor = Color.Gray,
-                        focusedTextColor = lightGreenText,
-                        unfocusedTextColor = lightGreenText
+                        focusedBorderColor = colors.primary,
+                        unfocusedBorderColor = colors.outline,
+                        focusedLabelColor = colors.primary,
+                        unfocusedLabelColor = colors.onSurfaceVariant,
+                        focusedTextColor = colors.onSurface,
+                        unfocusedTextColor = colors.onSurface,
+                        cursorColor = colors.primary
                     )
                 )
 
@@ -144,15 +143,19 @@ fun ReviewScreen(
                         modifier = Modifier
                             .size(54.dp)
                             .clip(CircleShape)
-                            .background(if (showDetails) accentGreen else Color(0xFF1B4332))
+                            .background(if (showDetails) colors.primary else colors.surfaceVariant)
                             .clickable { showDetails = !showDetails },
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "ℹ",
-                            color = lightGreenText,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = if (showDetails) {
+                                "Ocultar detalles de identificación"
+                            } else {
+                                "Mostrar detalles de identificación"
+                            },
+                            tint = if (showDetails) colors.onPrimary else colors.onSurface,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
                 }
@@ -163,16 +166,15 @@ fun ReviewScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Color(0xFF1B4332).copy(alpha = 0.5f))
-                        .border(BorderStroke(1.dp, Color(0xFF1B4332)), RoundedCornerShape(12.dp))
+                        .clip(MaterialTheme.shapes.medium)
+                        .background(colors.surfaceVariant.copy(alpha = 0.6f))
+                        .border(BorderStroke(1.dp, colors.outlineVariant), MaterialTheme.shapes.medium)
                         .padding(16.dp)
                 ) {
                     Text(
                         text = "Resultados de Identificación IA",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = lightGreenSub,
+                        style = type.titleSmall,
+                        color = colors.onSurfaceVariant,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
 
@@ -184,22 +186,22 @@ fun ReviewScreen(
                                 .padding(vertical = 4.dp),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(text = recognition.title, color = lightGreenText, fontSize = 14.sp)
-                            Text(text = "$pct%", color = accentGreen, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            Text(text = recognition.title, color = colors.onSurface, style = type.bodyMedium)
+                            Text(text = "$pct%", color = colors.primary, style = type.bodyMedium, fontWeight = FontWeight.Bold)
                         }
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
-                    
+
                     Button(
                         onClick = {
                             Toast.makeText(context, "Reporte enviado para corrección de IA", Toast.LENGTH_SHORT).show()
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF52B788).copy(alpha = 0.15f)),
-                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = colors.primary.copy(alpha = 0.15f)),
+                        shape = MaterialTheme.shapes.small,
                         modifier = Modifier.fillMaxWidth().height(36.dp)
                     ) {
-                        Text(text = "Reportar coincidencia incorrecta", color = Color(0xFF52B788), fontSize = 12.sp)
+                        Text(text = "Reportar coincidencia incorrecta", color = colors.primary, style = type.labelLarge)
                     }
                 }
             }
@@ -212,14 +214,15 @@ fun ReviewScreen(
                 label = { Text("Notas u observaciones (opcional)") },
                 modifier = Modifier.fillMaxWidth(),
                 maxLines = 3,
-                shape = RoundedCornerShape(12.dp),
+                shape = MaterialTheme.shapes.medium,
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = accentGreen,
-                    unfocusedBorderColor = Color(0xFF1B4332),
-                    focusedLabelColor = lightGreenSub,
-                    unfocusedLabelColor = Color.Gray,
-                    focusedTextColor = lightGreenText,
-                    unfocusedTextColor = lightGreenText
+                    focusedBorderColor = colors.primary,
+                    unfocusedBorderColor = colors.outline,
+                    focusedLabelColor = colors.primary,
+                    unfocusedLabelColor = colors.onSurfaceVariant,
+                    focusedTextColor = colors.onSurface,
+                    unfocusedTextColor = colors.onSurface,
+                    cursorColor = colors.primary
                 )
             )
 
@@ -238,13 +241,13 @@ fun ReviewScreen(
                         onRetake()
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                    border = BorderStroke(1.dp, Color(0xFF1B4332)),
-                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, colors.outline),
+                    shape = MaterialTheme.shapes.medium,
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp)
                 ) {
-                    Text(text = "Reintentar", color = lightGreenSub)
+                    Text(text = "Reintentar", color = colors.onSurfaceVariant, style = type.labelLarge)
                 }
 
                 Spacer(modifier = Modifier.width(16.dp))
@@ -262,17 +265,18 @@ fun ReviewScreen(
                     },
                     enabled = speciesName.isNotBlank(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = accentGreen,
-                        disabledContainerColor = Color(0xFF1B4332).copy(alpha = 0.5f)
+                        containerColor = colors.primary,
+                        disabledContainerColor = colors.surfaceVariant.copy(alpha = 0.5f)
                     ),
-                    shape = RoundedCornerShape(12.dp),
+                    shape = MaterialTheme.shapes.medium,
                     modifier = Modifier
                         .weight(1f)
                         .height(48.dp)
                 ) {
                     Text(
                         text = "Guardar",
-                        color = if (speciesName.isNotBlank()) lightGreenText else Color.Gray,
+                        color = if (speciesName.isNotBlank()) colors.onPrimary else colors.onSurfaceVariant,
+                        style = type.labelLarge,
                         fontWeight = FontWeight.Bold
                     )
                 }

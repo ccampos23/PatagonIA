@@ -16,11 +16,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Forest
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,8 +33,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,12 +46,8 @@ fun LoadingScreen(
     modifier: Modifier = Modifier
 ) {
     val downloadStatus by viewModel.downloadStatus.collectAsState()
-
-    val darkGreenBg = Color(0xFF081C15)
-    val lightGreenText = Color(0xFFD8F3DC)
-    val accentGreen = Color(0xFF40916C)
-    val lightGreenSub = Color(0xFF95D5B2)
-    val errorColor = Color(0xFFE63946)
+    val colors = MaterialTheme.colorScheme
+    val type = MaterialTheme.typography
 
     LaunchedEffect(downloadStatus) {
         if (downloadStatus is DownloadStatus.Idle) {
@@ -62,7 +60,7 @@ fun LoadingScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(darkGreenBg),
+            .background(colors.background),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -75,13 +73,15 @@ fun LoadingScreen(
             Box(
                 modifier = Modifier
                     .size(100.dp)
-                    .clip(RoundedCornerShape(50.dp))
-                    .background(Color(0xFF1B4332)),
+                    .clip(CircleShape)
+                    .background(colors.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = "🌿",
-                    fontSize = 48.sp
+                Icon(
+                    imageVector = Icons.Default.Forest,
+                    contentDescription = null,
+                    tint = colors.primary,
+                    modifier = Modifier.size(52.dp)
                 )
             }
 
@@ -89,18 +89,17 @@ fun LoadingScreen(
 
             Text(
                 text = "PatagonIA",
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                color = lightGreenText,
-                letterSpacing = 2.sp
+                style = type.headlineLarge,
+                color = colors.onSurface,
+                letterSpacing = 3.sp
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = "Tu guía de avistamientos offline",
-                fontSize = 15.sp,
-                color = lightGreenSub,
+                style = type.bodyLarge,
+                color = colors.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
 
@@ -108,12 +107,12 @@ fun LoadingScreen(
 
             when (val status = downloadStatus) {
                 is DownloadStatus.Idle -> {
-                    CircularProgressIndicator(color = accentGreen)
+                    CircularProgressIndicator(color = colors.primary)
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = "Conectando...",
-                        color = lightGreenSub,
-                        fontSize = 14.sp
+                        style = type.bodyMedium,
+                        color = colors.onSurfaceVariant
                     )
                 }
                 is DownloadStatus.Progress -> {
@@ -130,54 +129,52 @@ fun LoadingScreen(
                     ) {
                         LinearProgressIndicator(
                             progress = { animatedProgress },
-                            color = accentGreen,
-                            trackColor = Color(0xFF1B4332),
+                            color = colors.primary,
+                            trackColor = colors.surfaceVariant,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(8.dp)
-                                .clip(RoundedCornerShape(4.dp))
+                                .clip(MaterialTheme.shapes.extraSmall)
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
 
                         Text(
                             text = "${status.percentage}%",
-                            color = lightGreenText,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold
+                            style = type.titleLarge,
+                            color = colors.onSurface
                         )
 
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
                             text = "Descargando base de reconocimiento e iNaturalist...",
-                            color = lightGreenSub,
-                            fontSize = 13.sp,
+                            style = type.bodyMedium,
+                            color = colors.onSurfaceVariant,
                             textAlign = TextAlign.Center
                         )
                     }
                 }
                 is DownloadStatus.Success -> {
-                    CircularProgressIndicator(progress = { 1f }, color = accentGreen)
+                    CircularProgressIndicator(progress = { 1f }, color = colors.primary)
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = "¡Descarga completa! Iniciando...",
-                        color = lightGreenSub,
-                        fontSize = 14.sp
+                        style = type.bodyMedium,
+                        color = colors.onSurfaceVariant
                     )
                 }
                 is DownloadStatus.Error -> {
                     Text(
                         text = "Error de descarga",
-                        color = errorColor,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
+                        style = type.titleLarge,
+                        color = colors.error
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = status.message,
-                        color = Color.LightGray,
-                        fontSize = 13.sp,
+                        style = type.bodyMedium,
+                        color = colors.onSurfaceVariant,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
@@ -189,21 +186,21 @@ fun LoadingScreen(
                     ) {
                         Button(
                             onClick = { viewModel.startDownload() },
-                            colors = ButtonDefaults.buttonColors(containerColor = accentGreen),
-                            shape = RoundedCornerShape(12.dp)
+                            colors = ButtonDefaults.buttonColors(containerColor = colors.primary),
+                            shape = MaterialTheme.shapes.medium
                         ) {
-                            Text(text = "Reintentar", color = lightGreenText)
+                            Text(text = "Reintentar", style = type.labelLarge, color = colors.onPrimary)
                         }
 
                         Spacer(modifier = Modifier.width(12.dp))
 
                         Button(
                             onClick = onDownloadComplete,
-                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1B4332)),
-                            border = BorderStroke(1.dp, Color(0xFF40916C)),
-                            shape = RoundedCornerShape(12.dp)
+                            colors = ButtonDefaults.buttonColors(containerColor = colors.surfaceVariant),
+                            border = BorderStroke(1.dp, colors.primary),
+                            shape = MaterialTheme.shapes.medium
                         ) {
-                            Text(text = "Usar sin internet", color = lightGreenSub)
+                            Text(text = "Usar sin internet", style = type.labelLarge, color = colors.onSurfaceVariant)
                         }
                     }
                 }

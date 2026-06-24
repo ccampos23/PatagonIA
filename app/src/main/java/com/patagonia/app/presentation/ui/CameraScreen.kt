@@ -36,9 +36,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -52,10 +56,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import java.io.File
@@ -75,6 +77,8 @@ fun CameraScreen(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val recognitions by viewModel.recognitions.collectAsState()
+    val colors = MaterialTheme.colorScheme
+    val type = MaterialTheme.typography
 
     var hasCameraPermission by remember {
         mutableStateOf(
@@ -223,8 +227,8 @@ fun CameraScreen(
                     modifier = Modifier
                         .size(56.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFF081C15).copy(alpha = 0.7f))
-                        .border(BorderStroke(1.5.dp, Color(0xFF40916C)), CircleShape)
+                        .background(colors.background.copy(alpha = 0.7f))
+                        .border(BorderStroke(1.5.dp, colors.primary), CircleShape)
                         .clickable {
                             galleryLauncher.launch(
                                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
@@ -232,9 +236,11 @@ fun CameraScreen(
                         },
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = "🖼",
-                        fontSize = 24.sp
+                    Icon(
+                        imageVector = Icons.Default.PhotoLibrary,
+                        contentDescription = "Abrir galería",
+                        tint = colors.primary,
+                        modifier = Modifier.size(26.dp)
                     )
                 }
 
@@ -279,17 +285,16 @@ fun CameraScreen(
                 ) {
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(Color(0xFF081C15).copy(alpha = 0.85f))
-                            .border(BorderStroke(1.dp, Color(0xFF40916C)), RoundedCornerShape(12.dp))
+                            .clip(MaterialTheme.shapes.medium)
+                            .background(colors.background.copy(alpha = 0.85f))
+                            .border(BorderStroke(1.dp, colors.primary), MaterialTheme.shapes.medium)
                             .padding(horizontal = 20.dp, vertical = 10.dp)
                     ) {
                         val percentage = (topRecognition.confidence * 100).toInt()
                         Text(
                             text = "${topRecognition.title} ($percentage%)",
-                            color = Color(0xFFD8F3DC),
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
+                            color = colors.onSurface,
+                            style = type.titleMedium
                         )
                     }
                 }
@@ -298,38 +303,39 @@ fun CameraScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0xFF081C15))
+                    .background(colors.background)
                     .padding(32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(
-                    text = "🌿",
-                    fontSize = 64.sp
+                Icon(
+                    imageVector = Icons.Default.PhotoCamera,
+                    contentDescription = null,
+                    tint = colors.primary,
+                    modifier = Modifier.size(64.dp)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = "Permiso de Cámara Requerido",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFFD8F3DC),
+                    style = type.headlineSmall,
+                    color = colors.onSurface,
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = "Para poder utilizar el avistamiento e identificar especies silvestres, debes otorgar permiso de cámara.",
-                    fontSize = 14.sp,
-                    color = Color(0xFF95D5B2),
+                    style = type.bodyMedium,
+                    color = colors.onSurfaceVariant,
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(32.dp))
                 Button(
                     onClick = { launcher.launch(Manifest.permission.CAMERA) },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF40916C)),
-                    shape = RoundedCornerShape(12.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = colors.primary),
+                    shape = MaterialTheme.shapes.medium,
                     modifier = Modifier.height(48.dp)
                 ) {
-                    Text(text = "Otorgar permiso", color = Color(0xFFD8F3DC))
+                    Text(text = "Otorgar permiso", color = colors.onPrimary, style = type.labelLarge)
                 }
             }
         }
@@ -403,4 +409,3 @@ private fun getExifRotation(filePath: String): Int {
         0
     }
 }
-

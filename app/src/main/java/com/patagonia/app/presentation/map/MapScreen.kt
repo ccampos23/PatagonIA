@@ -46,6 +46,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.patagonia.app.domain.model.Capture
 import com.patagonia.app.presentation.viewmodel.MapUiState
 import com.patagonia.app.presentation.viewmodel.MapViewModel
+import com.mapbox.maps.extension.compose.MapboxMap
+import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
+import com.mapbox.maps.extension.compose.style.MapStyle
+import com.mapbox.geojson.Point
+import com.mapbox.maps.extension.compose.annotation.generated.PointAnnotation
+
 
 /**
  * Map screen composable that displays the Mapbox map with trail overlays and capture pins.
@@ -88,37 +94,32 @@ fun MapScreenContent(
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier.fillMaxSize()) {
-        // ──────────────────────────────────────────────────────
-        // Map Area
-        // When Mapbox SDK dependencies are enabled, replace this
-        // placeholder with:
-        //
-        // val mapViewportState = rememberMapViewportState {
-        //     setCameraOptions {
-        //         center(Point.fromLngLat(uiState.cameraLongitude, uiState.cameraLatitude))
-        //         zoom(uiState.cameraZoom)
-        //     }
-        // }
-        // MapboxMap(
-        //     modifier = Modifier.fillMaxSize(),
-        //     mapViewportState = mapViewportState,
-        //     style = { MapStyle(style = uiState.styleUri) }
-        // ) {
-        //     MapEffect(Unit) { mapView ->
-        //         // Trail GeoJSON overlay, pin annotations, etc.
-        //         // Pin tap callback:
-        //         // annotation.addClickListener { onCaptureSelected(capture) }
-        //     }
-        // }
-        // ──────────────────────────────────────────────────────
-        MapPlaceholder(
-            styleUri = uiState.styleUri,
-            latitude = uiState.cameraLatitude,
-            longitude = uiState.cameraLongitude,
-            modifier = Modifier.fillMaxSize()
-        )
+        val mapViewportState = rememberMapViewportState {
+            setCameraOptions {
+                center(Point.fromLngLat(uiState.cameraLongitude, uiState.cameraLatitude))
+                zoom(uiState.cameraZoom)
+            }
+        }
+
+        MapboxMap(
+            modifier = Modifier.fillMaxSize(),
+            mapViewportState = mapViewportState,
+            style = { MapStyle(style = uiState.styleUri) }
+        ) {
+            // Draw interactive markers for each species capture on the map (D-23)
+            uiState.captures.forEach { capture ->
+                PointAnnotation(
+                    point = Point.fromLngLat(capture.longitude, capture.latitude),
+                    onClick = {
+                        onCaptureSelected(capture)
+                        true
+                    }
+                )
+            }
+        }
 
         // Map controls overlay
+
         Column(
             modifier = Modifier
                 .align(Alignment.TopEnd)

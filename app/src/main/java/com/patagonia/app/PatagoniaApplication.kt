@@ -4,14 +4,20 @@ import android.app.Application
 import android.util.Log
 import com.patagonia.app.data.config.MapboxStorageConfig
 import dagger.hilt.android.HiltAndroidApp
+import com.mapbox.common.MapboxOptions
 
 @HiltAndroidApp
 class PatagoniaApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        
+        // Set Mapbox access token globally at application launch (D-10)
+        MapboxOptions.accessToken = BuildConfig.MAPBOX_ACCESS_TOKEN
+        
         configureTileStore()
     }
+
 
     /**
      * Configure Mapbox TileStore to use internal storage (D-24)

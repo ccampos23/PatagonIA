@@ -1,0 +1,208 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-24T00:00:00Z",
+  "title": "Design System: PataGOnIA",
+  "extensions": {
+    "colorMeta": {
+      "forest-night": {
+        "role": "neutral",
+        "displayName": "Forest Night",
+        "canonical": "#07140E",
+        "tonalRamp": ["#07140E", "#0F211A", "#163024", "#1B4332", "#2E6A4F", "#5FBF8A", "#C9EBD4", "#E6F3EA"]
+      },
+      "forest-primary": {
+        "role": "primary",
+        "displayName": "Forest Primary",
+        "canonical": "#2E6A4F",
+        "tonalRamp": ["#07140E", "#0F211A", "#163024", "#1B4332", "#2E6A4F", "#5FBF8A", "#C9EBD4", "#E6F3EA"]
+      },
+      "background-light": {
+        "role": "neutral",
+        "displayName": "Daylight Background",
+        "canonical": "#F4F8F4",
+        "tonalRamp": ["#14241B", "#3E5A4A", "#5C7565", "#B4C4B8", "#E3EAE3", "#F4F8F4", "#FFFFFF", "#FFFFFF"]
+      },
+      "earth": {
+        "role": "secondary",
+        "displayName": "Trail Earth",
+        "canonical": "#5D4037",
+        "tonalRamp": ["#1A0E08", "#2E1B12", "#5D4037", "#B89A8E", "#EADBD0", "#F4ECE7", "#FFFFFF", "#FFFFFF"]
+      },
+      "teal-info": {
+        "role": "tertiary",
+        "displayName": "Glacial Teal Info",
+        "canonical": "#2D5F66",
+        "tonalRamp": ["#06262B", "#163B40", "#2D5F66", "#4A8B94", "#7FD3DE", "#C8F0F4", "#FFFFFF", "#FFFFFF"]
+      },
+      "error": {
+        "role": "error",
+        "displayName": "Field Error Red",
+        "canonical": "#B3261E",
+        "tonalRamp": ["#410005", "#690005", "#93000A", "#B3261E", "#FFB4AB", "#F9D9D6", "#FFF0EF", "#FFFFFF"]
+      },
+      "warning": {
+        "role": "warning",
+        "displayName": "Trail Warning Amber",
+        "canonical": "#8A5D00",
+        "tonalRamp": ["#3A2400", "#5F3D00", "#8A5D00", "#B98100", "#FFC069", "#FFE1B0", "#FFF4DE", "#FFFFFF"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Rare brand-scale moments only; not routine UI labels."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Screen titles and major state headings."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Cards, species names, active download labels, and section headings."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Educational copy, metadata, validation, and supporting text."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Buttons, chips, compact coordinates, and small UI states."
+      }
+    },
+    "shadows": [
+      {
+        "name": "tooltip-lift",
+        "value": "8dp Material card elevation",
+        "purpose": "Transient map capture tooltip floating above variable map content."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-reveal",
+        "value": "Material AnimatedVisibility with fade and vertical slide where implemented",
+        "purpose": "Reveal validation, delete confirmation, and map tooltip states without decorative choreography."
+      }
+    ],
+    "breakpoints": []
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Forest action button for save, download, retry, and permission actions.",
+      "html": "<button class=\"ds-btn-primary\">Guardar</button>",
+      "css": ".ds-btn-primary { background: #2E6A4F; color: #FFFFFF; min-height: 48px; padding: 0 16px; border: 0; border-radius: 12px; font-family: 'Fira Sans', sans-serif; font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: 0.1px; transition: background-color 180ms ease-out, transform 180ms ease-out; } .ds-btn-primary:hover { background: #1B4332; } .ds-btn-primary:focus-visible { outline: 3px solid #5FBF8A; outline-offset: 2px; } .ds-btn-primary:active { transform: translateY(1px); }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Tonal secondary action for cancel, retry alternatives, and offline fallback choices.",
+      "html": "<button class=\"ds-btn-secondary\">Cancelar</button>",
+      "css": ".ds-btn-secondary { background: #E3EAE3; color: #3E5A4A; min-height: 48px; padding: 0 16px; border: 1px solid #5C7565; border-radius: 12px; font-family: 'Fira Sans', sans-serif; font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: 0.1px; transition: border-color 180ms ease-out, background-color 180ms ease-out; } .ds-btn-secondary:hover { background: #C9EBD4; border-color: #2E6A4F; } .ds-btn-secondary:focus-visible { outline: 3px solid #5FBF8A; outline-offset: 2px; }"
+    },
+    {
+      "name": "Danger Button",
+      "kind": "button",
+      "refersTo": "button-danger",
+      "description": "Destructive or failed-state action using the single app error red.",
+      "html": "<button class=\"ds-btn-danger\">Confirmar</button>",
+      "css": ".ds-btn-danger { background: #B3261E; color: #FFFFFF; min-height: 48px; padding: 0 16px; border: 0; border-radius: 12px; font-family: 'Fira Sans', sans-serif; font-size: 14px; line-height: 20px; font-weight: 500; letter-spacing: 0.1px; } .ds-btn-danger:hover { background: #93000A; } .ds-btn-danger:focus-visible { outline: 3px solid #FFB4AB; outline-offset: 2px; }"
+    },
+    {
+      "name": "Surface Card",
+      "kind": "card",
+      "refersTo": "card-surface",
+      "description": "Flat tonal container for park presets, downloaded maps, forms, and empty states.",
+      "html": "<article class=\"ds-card\"><h3>Parque Nacional</h3><p>Region - 120 MB</p></article>",
+      "css": ".ds-card { background: #FFFFFF; color: #14241B; border-radius: 16px; padding: 16px; border: 0; box-shadow: none; font-family: 'Fira Sans', sans-serif; } .ds-card h3 { margin: 0 0 4px; font-size: 17px; line-height: 24px; font-weight: 600; } .ds-card p { margin: 0; color: #3E5A4A; font-size: 14px; line-height: 21px; }"
+    },
+    {
+      "name": "Outlined Field",
+      "kind": "input",
+      "refersTo": "input-outlined",
+      "description": "Material outlined field for species names, notes, and map coordinates.",
+      "html": "<label class=\"ds-field\"><span>Nombre del Mapa</span><input value=\"Torres del Paine\" /></label>",
+      "css": ".ds-field { display: grid; gap: 4px; color: #3E5A4A; font-family: 'Fira Sans', sans-serif; font-size: 12px; line-height: 16px; font-weight: 500; } .ds-field input { min-height: 56px; border: 1px solid #5C7565; border-radius: 12px; background: transparent; color: #14241B; padding: 0 14px; font-family: 'Fira Sans', sans-serif; font-size: 16px; line-height: 24px; } .ds-field input:focus { border-color: #2E6A4F; outline: 2px solid #C9EBD4; outline-offset: 1px; }"
+    },
+    {
+      "name": "Filter Chip",
+      "kind": "chip",
+      "refersTo": "chip-filter",
+      "description": "Compact mode switch for map filters such as journal versus global sightings.",
+      "html": "<button class=\"ds-chip\">My Journal</button>",
+      "css": ".ds-chip { background: #C9EBD4; color: #0C3320; min-height: 32px; padding: 0 12px; border: 1px solid transparent; border-radius: 28px; font-family: 'Fira Sans', sans-serif; font-size: 14px; line-height: 20px; font-weight: 500; } .ds-chip:hover { border-color: #2E6A4F; } .ds-chip:focus-visible { outline: 3px solid #5FBF8A; outline-offset: 2px; }"
+    },
+    {
+      "name": "Map Tooltip",
+      "kind": "custom",
+      "refersTo": "card-surface",
+      "description": "Elevated selected-capture overlay with thumbnail, species, scientific name, and coordinates.",
+      "html": "<aside class=\"ds-map-tooltip\"><div class=\"ds-thumb\">ID</div><div><strong>Huemul</strong><em>Hippocamelus bisulcus</em><small>-51.0, -73.0</small></div></aside>",
+      "css": ".ds-map-tooltip { display: flex; align-items: center; gap: 12px; background: #FFFFFF; color: #14241B; border-radius: 16px; padding: 12px; box-shadow: 0 8px 24px rgba(7, 20, 14, 0.24); font-family: 'Fira Sans', sans-serif; } .ds-thumb { width: 56px; height: 56px; border-radius: 999px; display: grid; place-items: center; background: #C9EBD4; color: #0C3320; } .ds-map-tooltip strong { display: block; font-size: 17px; line-height: 24px; font-weight: 700; } .ds-map-tooltip em { display: block; color: #3E5A4A; font-size: 12.5px; line-height: 18px; } .ds-map-tooltip small { display: block; color: #5C7565; font-size: 11px; line-height: 16px; }"
+    },
+    {
+      "name": "Camera Chrome Action",
+      "kind": "custom",
+      "refersTo": "button-primary",
+      "description": "Circular camera affordance: dark chrome, bright forest outline, high contrast touch target.",
+      "html": "<button class=\"ds-camera-action\" aria-label=\"Abrir galeria\"><span></span></button>",
+      "css": ".ds-camera-action { width: 56px; height: 56px; border-radius: 999px; background: rgba(7, 20, 14, 0.7); border: 1.5px solid #5FBF8A; display: grid; place-items: center; } .ds-camera-action span { width: 26px; height: 20px; border: 2px solid #5FBF8A; border-radius: 4px; position: relative; } .ds-camera-action span::after { content: ''; position: absolute; width: 6px; height: 6px; border-radius: 999px; background: #5FBF8A; right: 3px; top: 3px; } .ds-camera-action:focus-visible { outline: 3px solid #E6F3EA; outline-offset: 3px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Bitacora Viva de Campo",
+    "overview": "PataGOnIA is a field notebook that happens to be a mobile app: serious enough to be trusted for species identification and citizen-science records, alive enough to make learning biodiversity feel inviting. The interface must feel adult, reliable, and educational without becoming dry. It uses a restrained forest system, crisp contrast, real typography, and Material-native controls so the user can keep moving on trail.",
+    "keyCharacteristics": [
+      "Restrained forest-green palette with one primary accent used for action, selection, and status.",
+      "High-contrast ink on green-tinted neutrals for outdoor readability.",
+      "Forced dark capture flow for camera, review, and first-run loading.",
+      "Fira Sans throughout: humanist, readable, offline bundled, never decorative.",
+      "Tactile but sober controls: clear touch targets, modest radii, no cartoon surfaces."
+    ],
+    "rules": [
+      {
+        "name": "The One Forest Accent Rule",
+        "body": "Primary green is for action, selected state, focus, and progress. Do not use it as decoration across every card.",
+        "section": "colors"
+      },
+      {
+        "name": "The No Beige Field Rule",
+        "body": "Warmth is carried by copy, species imagery, and earth secondary roles. Do not use cream, sand, parchment, or paper neutrals as the body background.",
+        "section": "colors"
+      },
+      {
+        "name": "The Outdoor Contrast Rule",
+        "body": "If secondary text starts to feel elegant but pale, it is wrong. Push it toward ink-variant or mint-variant until it reads at a glance outdoors.",
+        "section": "colors"
+      },
+      {
+        "name": "The One-Family Rule",
+        "body": "Do not introduce a second typeface for flavor. Product trust comes from consistent Fira Sans hierarchy.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tonal-First Rule",
+        "body": "Cards, forms, and download panels are separated by surface tokens and spacing before shadows. If a static card needs a shadow to be understood, the surface hierarchy is wrong.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep the primary context sentence in mind: hikers use this outdoors in bright Patagonia light, often one-handed and offline.",
+      "Do use forest-primary only for action, selected state, focus, and progress.",
+      "Do use CaptureTheme for camera, review, and first-run loading when dark camera chrome is the correct UX.",
+      "Do use Material Icons for actions and states; give interactive icons clear content descriptions.",
+      "Do keep cards flat and tonal unless they are true overlays.",
+      "Do write empty and error states that teach the next action, especially offline readiness."
+    ],
+    "donts": [
+      "Don't create an App de caricatura/juguete: no toy saturation, cartoon wildlife, emoji iconography, or Pokemon-like capture language.",
+      "Don't create Densidad de panel admin: no dense data tables, dashboard walls, or office-console layouts for field workflows.",
+      "Don't use AI beige/cream: no cream, sand, parchment, paper, ivory, or warm-neutral body backgrounds as a shortcut to warmth.",
+      "Don't use side-stripe borders, gradient text, glassmorphism, hero-metric templates, or identical decorative card grids.",
+      "Don't add new hard-coded colors in screens. Route color through Color.kt, Theme.kt, and MaterialTheme.",
+      "Don't use text glyphs or emoji as icons. The regression test blocks camera, map, leaf, image, and info text glyphs in presentation code."
+    ]
+  }
+}

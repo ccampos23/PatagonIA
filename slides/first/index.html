@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PataGOnIA - Power Pitch</title>
+  <style>
+    @font-face {
+      font-family: 'Fira Sans';
+      src: url('../../app/src/main/res/font/fira_sans_regular.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'Fira Sans';
+      src: url('../../app/src/main/res/font/fira_sans_medium.ttf') format('truetype');
+      font-weight: 500;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'Fira Sans';
+      src: url('../../app/src/main/res/font/fira_sans_semibold.ttf') format('truetype');
+      font-weight: 600;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'Fira Sans';
+      src: url('../../app/src/main/res/font/fira_sans_bold.ttf') format('truetype');
+      font-weight: 700;
+      font-style: normal;
+      font-display: swap;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --forest-night: #07140E;
+      --forest-surface: #0F211A;
+      --forest-surface-variant: #163024;
+      --forest-container: #1B4332;
+      --forest-primary: #2E6A4F;
+      --forest-bright: #5FBF8A;
+      --forest-mint: #C9EBD4;
+      --mint-text: #E6F3EA;
+      --mint-variant: #A8C7B6;
+      --mint-chip-text: #0C3320;
+      --ink: #14241B;
+      --ink-variant: #3E5A4A;
+      --outline-light: #5C7565;
+      --outline-dark: #4A8268;
+      --background-light: #F4F8F4;
+      --surface-variant-light: #E3EAE3;
+      --white: #FFFFFF;
+      --earth: #5D4037;
+      --earth-container: #EADBD0;
+      --teal-info: #2D5F66;
+      --warning: #FFC069;
+      --shadow-soft: 0 24px 70px rgba(7, 20, 14, 0.34);
+      --shadow-card: 0 16px 42px rgba(7, 20, 14, 0.22);
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+      --nav-height: 72px;
+    }
+
+    html {
+      overflow-x: hidden;
+      overflow-y: scroll;
+      scroll-behavior: smooth;
+      scroll-snap-type: y mandatory;
+      background: var(--forest-night);
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: 'Fira Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--forest-night);
+      color: var(--mint-text);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    .nav {
+      position: fixed;
+      inset: 0 0 auto;
+      z-index: 20;
+      height: var(--nav-height);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      background: rgba(7, 20, 14, 0.94);
+      border-bottom: 1px solid rgba(74, 130, 104, 0.42);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      color: var(--mint-text);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .nav-logo strong {
+      color: var(--forest-bright);
+    }
+
+    .nav-logo small {
+      color: var(--mint-variant);
+      font-size: 0.78rem;
+      font-weight: 500;
+    }
+
+    .nav-progress {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .nav-dots {
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-dot {
+      width: 9px;
+      height: 9px;
+      border: 1px solid rgba(168, 199, 182, 0.72);
+      border-radius: 999px;
+      background: transparent;
+      cursor: pointer;
+      transition: background-color 180ms ease-out, border-color 180ms ease-out, width 180ms ease-out;
+    }
+
+    .nav-dot.active {
+      width: 28px;
+      background: var(--forest-bright);
+      border-color: var(--forest-bright);
+    }
+
+    .nav-slide-count {
+      min-width: 48px;
+      color: var(--mint-variant);
+      font-size: 0.82rem;
+      font-weight: 500;
+      text-align: right;
+    }
+
+    .slide {
+      min-height: 100vh;
+      width: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: calc(var(--nav-height) + 40px) 40px 56px;
+      scroll-snap-align: start;
+    }
+
+    .slide::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 82% 18%, rgba(95, 191, 138, 0.16), transparent 34%),
+        radial-gradient(circle at 10% 80%, rgba(45, 95, 102, 0.22), transparent 32%);
+    }
+
+    .slide-content {
+      position: relative;
+      z-index: 2;
+      width: min(1180px, 100%);
+    }
+
+    .slide--light {
+      background: var(--background-light);
+      color: var(--ink);
+    }
+
+    .slide--light::before {
+      background:
+        radial-gradient(circle at 86% 18%, rgba(201, 235, 212, 0.68), transparent 30%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(244, 248, 244, 0.92));
+    }
+
+    .slide--dark {
+      background: linear-gradient(180deg, var(--forest-night), var(--forest-surface));
+    }
+
+    .section-title,
+    .hero-title,
+    .cta-title {
+      max-width: 920px;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      text-wrap: balance;
+    }
+
+    .section-title {
+      margin-bottom: 26px;
+      font-size: clamp(2.1rem, 4.4vw, 4.15rem);
+      line-height: 1.04;
+    }
+
+    .section-lede {
+      max-width: 760px;
+      color: var(--mint-variant);
+      font-size: 1.12rem;
+      line-height: 1.7;
+      text-wrap: pretty;
+    }
+
+    .slide--light .section-lede,
+    .slide--light .muted {
+      color: var(--ink-variant);
+    }
+
+    .accent {
+      color: var(--forest-bright);
+    }
+
+    .slide--light .accent {
+      color: var(--forest-primary);
+    }
+
+    .fade-up {
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 540ms var(--ease), transform 540ms var(--ease);
+    }
+
+    .js .fade-up {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+
+    .js .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .delay-1 { transition-delay: 70ms; }
+    .delay-2 { transition-delay: 140ms; }
+    .delay-3 { transition-delay: 210ms; }
+    .delay-4 { transition-delay: 280ms; }
+    .delay-5 { transition-delay: 350ms; }
+    .delay-6 { transition-delay: 420ms; }
+
+    .slide-hero {
+      background: var(--forest-night);
+    }
+
+    .slide-hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(7, 20, 14, 0.96) 0%, rgba(7, 20, 14, 0.82) 48%, rgba(7, 20, 14, 0.42) 100%),
+        url('images/patagonia_hero.png') center right / cover no-repeat;
+      opacity: 0.98;
+    }
+
+    .hero-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.06fr) minmax(320px, 0.72fr);
+      gap: 44px;
+      align-items: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 0 13px;
+      margin-bottom: 24px;
+      border-radius: 999px;
+      border: 1px solid var(--outline-dark);
+      background: rgba(15, 33, 26, 0.84);
+      color: var(--forest-mint);
+      font-size: 0.86rem;
+      font-weight: 600;
+    }
+
+    .hero-title {
+      margin-bottom: 22px;
+      font-size: clamp(3.25rem, 7vw, 5.85rem);
+      line-height: 0.96;
+    }
+
+    .hero-subtitle {
+      max-width: 690px;
+      margin-bottom: 30px;
+      color: var(--mint-text);
+      font-size: clamp(1.12rem, 1.8vw, 1.42rem);
+      line-height: 1.58;
+      text-wrap: pretty;
+    }
+
+    .hero-proof {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      max-width: 720px;
+    }
+
+    .hero-proof span {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(168, 199, 182, 0.36);
+      background: rgba(15, 33, 26, 0.68);
+      color: var(--mint-variant);
+      font-size: 0.86rem;
+      font-weight: 500;
+    }
+
+    .hero-device {
+      justify-self: center;
+      width: min(320px, 100%);
+      padding: 12px;
+      border-radius: 34px;
+      border: 1px solid rgba(168, 199, 182, 0.26);
+      background: linear-gradient(180deg, rgba(22, 48, 36, 0.92), rgba(7, 20, 14, 0.88));
+      box-shadow: var(--shadow-soft);
+    }
+
+    .hero-device img,
+    .phone-frame img {
+      display: block;
+      width: 100%;
+      border-radius: 24px;
+    }
+
+    .problem-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 38px;
+    }
+
+    .problem-card,
+    .feature-card,
+    .revenue-card,
+    .tech-item,
+    .audience-card,
+    .tam-panel,
+    .roadmap-info {
+      border: 1px solid rgba(74, 130, 104, 0.42);
+      border-radius: 16px;
+      background: rgba(15, 33, 26, 0.78);
+    }
+
+    .slide--light .problem-card,
+    .slide--light .feature-card,
+    .slide--light .revenue-card,
+    .slide--light .tech-item,
+    .slide--light .audience-card,
+    .slide--light .tam-panel,
+    .slide--light .roadmap-info {
+      border-color: rgba(92, 117, 101, 0.34);
+      background: var(--white);
+      box-shadow: 0 8px 28px rgba(20, 36, 27, 0.08);
+    }
+
+    .problem-card {
+      padding: 24px;
+    }
+
+    .card-kicker {
+      display: inline-flex;
+      margin-bottom: 14px;
+      color: var(--forest-bright);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+
+    .slide--light .card-kicker {
+      color: var(--forest-primary);
+    }
+
+    .problem-card h3,
+    .feature-card h3,
+    .revenue-card h3,
+    .audience-card h4,
+    .tech-item h4,
+    .roadmap-info h4 {
+      margin-bottom: 8px;
+      font-size: 1.04rem;
+      font-weight: 700;
+      line-height: 1.28;
+      text-wrap: balance;
+    }
+
+    .problem-card p,
+    .feature-card p,
+    .revenue-card p,
+    .audience-card p,
+    .tech-item p,
+    .roadmap-info p,
+    .tam-panel p {
+      color: var(--mint-variant);
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    .slide--light .problem-card p,
+    .slide--light .feature-card p,
+    .slide--light .revenue-card p,
+    .slide--light .audience-card p,
+    .slide--light .tech-item p,
+    .slide--light .roadmap-info p,
+    .slide--light .tam-panel p {
+      color: var(--ink-variant);
+    }
+
+    .solution-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 0.95fr) minmax(330px, 0.78fr);
+      gap: 52px;
+      align-items: center;
+    }
+
+    .solution-list {
+      display: grid;
+      gap: 14px;
+      margin-top: 30px;
+    }
+
+    .solution-highlight {
+      display: block;
+      align-items: start;
+      padding: 18px 20px;
+      border: 1px solid rgba(74, 130, 104, 0.46);
+      border-radius: 16px;
+      background: rgba(15, 33, 26, 0.72);
+    }
+
+    .feature-mark,
+    .revenue-mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: var(--forest-mint);
+      color: var(--mint-chip-text);
+      font-size: 0.83rem;
+      font-weight: 700;
+    }
+
+    .solution-highlight h4 {
+      margin-bottom: 4px;
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .solution-highlight p {
+      color: var(--mint-variant);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .phone-frame {
+      width: min(380px, 100%);
+      padding: 12px;
+      border-radius: 34px;
+      border: 1px solid rgba(168, 199, 182, 0.26);
+      background: linear-gradient(180deg, rgba(22, 48, 36, 0.9), rgba(7, 20, 14, 0.92));
+      box-shadow: var(--shadow-card);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 34px;
+    }
+
+    .feature-card {
+      min-height: 190px;
+      padding: 20px;
+    }
+
+    .feature-mark,
+    .revenue-mark {
+      margin-bottom: 14px;
+    }
+
+    .demo-showcase {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 24px;
+      align-items: end;
+      margin-top: 34px;
+    }
+
+    .demo-card {
+      display: grid;
+      justify-items: center;
+      gap: 14px;
+    }
+
+    .demo-phone {
+      width: min(280px, 100%);
+      padding: 10px;
+      border-radius: 30px;
+      border: 1px solid rgba(168, 199, 182, 0.28);
+      background: linear-gradient(180deg, rgba(22, 48, 36, 0.92), rgba(7, 20, 14, 0.92));
+      box-shadow: var(--shadow-card);
+    }
+
+    .demo-phone img {
+      display: block;
+      width: 100%;
+      border-radius: 22px;
+    }
+
+    .demo-phone-label {
+      color: var(--mint-text);
+      font-size: 0.96rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .demo-note {
+      max-width: 270px;
+      color: var(--mint-variant);
+      font-size: 0.84rem;
+      line-height: 1.45;
+      text-align: center;
+    }
+
+    .market-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
+      gap: 36px;
+      align-items: stretch;
+      margin-top: 34px;
+    }
+
+    .market-opportunity {
+      display: grid;
+      gap: 14px;
+    }
+
+    .tam-panel {
+      padding: 22px;
+    }
+
+    .tam-panel h3 {
+      margin-bottom: 8px;
+      color: var(--forest-mint);
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    .tam-panel strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--white);
+      font-size: 1.55rem;
+      line-height: 1.15;
+    }
+
+    .audience-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .audience-card {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      padding: 18px 20px;
+      align-items: start;
+    }
+
+    .audience-role,
+    .tech-role {
+      display: inline-flex;
+      width: fit-content;
+      min-height: 28px;
+      align-items: center;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: rgba(201, 235, 212, 0.12);
+      border: 1px solid rgba(168, 199, 182, 0.32);
+      color: var(--forest-mint);
+      font-size: 0.76rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .tech-role {
+      margin-bottom: 14px;
+    }
+
+    .audience-card h4,
+    .tech-item h4 {
+      font-size: 1.12rem;
+    }
+
+    .audience-card p,
+    .tech-item p {
+      font-size: 0.96rem;
+    }
+
+    .revenue-streams {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 34px;
+    }
+
+    .revenue-card {
+      padding: 20px;
+    }
+
+    .revenue-tag,
+    .roadmap-status {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: var(--forest-mint);
+      color: var(--mint-chip-text);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+
+    .revenue-tag {
+      margin-top: 14px;
+    }
+
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 34px;
+    }
+
+    .tech-item {
+      min-height: 136px;
+      padding: 20px;
+    }
+
+    .roadmap-timeline {
+      display: grid;
+      gap: 14px;
+      margin-top: 34px;
+    }
+
+    .roadmap-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .roadmap-dot {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(92, 117, 101, 0.48);
+      border-radius: 999px;
+      background: var(--white);
+      color: var(--forest-primary);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .roadmap-info {
+      padding: 16px 18px;
+    }
+
+    .roadmap-info h4 {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .slide-cta {
+      text-align: center;
+      background: var(--forest-night);
+    }
+
+    .slide-cta::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(7, 20, 14, 0.68), rgba(7, 20, 14, 0.96)),
+        url('images/team_outdoor.png') center / cover no-repeat;
+      opacity: 0.98;
+    }
+
+    .cta-title {
+      margin: 0 auto 24px;
+      font-size: clamp(2.8rem, 6vw, 5.2rem);
+      line-height: 0.98;
+    }
+
+    .cta-subtitle {
+      max-width: 760px;
+      margin: 0 auto 32px;
+      color: var(--mint-text);
+      font-size: 1.2rem;
+      line-height: 1.7;
+      text-wrap: pretty;
+    }
+
+    .ask-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 34px;
+    }
+
+    .ask-row span {
+      display: inline-flex;
+      align-items: center;
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: 12px;
+      background: var(--forest-primary);
+      color: var(--white);
+      font-size: 0.94rem;
+      font-weight: 600;
+    }
+
+    .cta-footer {
+      color: var(--mint-variant);
+      font-size: 0.9rem;
+    }
+
+    .keyboard-hint {
+      position: fixed;
+      right: 24px;
+      bottom: 20px;
+      z-index: 21;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 10px;
+      border: 1px solid rgba(74, 130, 104, 0.45);
+      border-radius: 12px;
+      background: rgba(7, 20, 14, 0.9);
+      color: var(--mint-variant);
+      font-size: 0.78rem;
+    }
+
+    .keyboard-hint kbd {
+      min-width: 24px;
+      height: 24px;
+      display: inline-grid;
+      place-items: center;
+      border: 1px solid rgba(168, 199, 182, 0.32);
+      border-radius: 6px;
+      background: var(--forest-surface-variant);
+      color: var(--mint-text);
+      font-family: inherit;
+      font-size: 0.72rem;
+    }
+
+    @media (max-width: 1000px) {
+      .hero-layout,
+      .solution-layout,
+      .market-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-device,
+      .phone-frame {
+        justify-self: start;
+        max-width: 300px;
+      }
+
+      .problem-grid,
+      .features-grid,
+      .demo-showcase,
+      .revenue-streams,
+      .tech-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 680px) {
+      .nav {
+        padding: 0 16px;
+      }
+
+      .nav-logo small,
+      .keyboard-hint {
+        display: none;
+      }
+
+      .slide {
+        padding: calc(var(--nav-height) + 28px) 20px 42px;
+      }
+
+      .problem-grid,
+      .features-grid,
+      .demo-showcase,
+      .revenue-streams,
+      .tech-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-title {
+        font-size: clamp(3rem, 16vw, 4.2rem);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *, *::before, *::after {
+        animation-duration: 1ms !important;
+        scroll-behavior: auto !important;
+        transition-duration: 1ms !important;
+      }
+    }
+
+    @media print {
+      html,
+      body {
+        background: var(--white);
+      }
+
+      .nav,
+      .keyboard-hint {
+        display: none;
+      }
+
+      .slide {
+        min-height: 100vh;
+        page-break-after: always;
+        scroll-snap-align: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav" aria-label="Navegacion de slides">
+    <div class="nav-logo"><strong>PataGOnIA</strong><small>Power Pitch</small></div>
+    <div class="nav-progress">
+      <div class="nav-dots" id="navDots" aria-hidden="true"></div>
+      <span class="nav-slide-count" id="slideCount">1 / 10</span>
+    </div>
+  </nav>
+
+  <section class="slide slide-hero" id="slide-0">
+    <div class="slide-content hero-layout">
+      <div>
+        <div class="hero-badge fade-up">Android nativo - Offline-first - IA on-device</div>
+        <h1 class="hero-title fade-up delay-1">Pata<span class="accent">GOnIA</span></h1>
+        <p class="hero-subtitle fade-up delay-2">
+          Tu diario de naturaleza personal con inteligencia artificial. Identifica, registra y comparte especies de Chile incluso cuando estas en medio de la nada, sin internet.
+        </p>
+        <div class="hero-proof fade-up delay-3">
+          <span>36 mil+ especies en Chile</span>
+          <span>Reconocimiento on-device</span>
+          <span>Registro local en terreno</span>
+          <span>Experiencia outdoor chilena</span>
+        </div>
+      </div>
+      <div class="hero-device fade-up delay-3">
+        <img src="images/app_camera_mockup.png" alt="Pantalla de camara de PataGOnIA">
+      </div>
+    </div>
+  </section>
+
+  <section class="slide slide--light" id="slide-1">
+    <div class="slide-content">
+      <h2 class="section-title fade-up delay-1">Chile tiene una biodiversidad increible, pero invisible.</h2>
+      <p class="section-lede fade-up delay-2">
+        El guion sigue intacto: la tension nace en terreno, donde la experiencia natural es enorme pero las herramientas digitales suelen fallar.
+      </p>
+      <div class="problem-grid">
+        <article class="problem-card fade-up delay-3">
+          <span class="card-kicker">Problema 1</span>
+          <h3>Sin senal en la naturaleza</h3>
+          <p>Los parques y senderos son justamente los lugares donde mas necesitas informacion, pero donde menos puedes depender de internet.</p>
+        </article>
+        <article class="problem-card fade-up delay-4">
+          <span class="card-kicker">Problema 2</span>
+          <h3>Especies unicas sin contexto</h3>
+          <p>La gente ve flora y fauna chilena, pero no siempre sabe que esta mirando ni por que importa.</p>
+        </article>
+        <article class="problem-card fade-up delay-5">
+          <span class="card-kicker">Problema 3</span>
+          <h3>Recuerdos que se pierden</h3>
+          <p>Las fotos quedan enterradas en el carrete, sin nombre, sin notas utiles y sin una bitacora que conserve el aprendizaje.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide slide--dark" id="slide-2">
+    <div class="slide-content solution-layout">
+      <div>
+        <h2 class="section-title fade-up delay-1">Un companero inteligente para cada aventura.</h2>
+        <p class="section-lede fade-up delay-2">
+          PataGOnIA une identificacion on-device, registro personal y una experiencia preparada para funcionar primero en el telefono.
+        </p>
+        <div class="solution-list">
+          <div class="solution-highlight fade-up delay-3">
+            <div>
+              <h4>Captura con IA</h4>
+              <p>El usuario apunta la camara o carga una foto y recibe sugerencias de especie directamente en el dispositivo.</p>
+            </div>
+          </div>
+          <div class="solution-highlight fade-up delay-4">
+            <div>
+              <h4>Diseno offline-first</h4>
+              <p>Modelos, registros locales y mapas descargables estan pensados para salir a terreno antes de recuperar senal.</p>
+            </div>
+          </div>
+          <div class="solution-highlight fade-up delay-5">
+            <div>
+              <h4>Diario de campo</h4>
+              <p>Cada captura guarda especie, foto, notas y contexto para convertir la caminata en aprendizaje.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-frame fade-up delay-3">
+        <img src="images/app_camera_mockup.png" alt="Mockup de captura con IA en PataGOnIA">
+      </div>
+    </div>
+  </section>
+
+  <section class="slide slide--light" id="slide-3">
+    <div class="slide-content">
+      <h2 class="section-title fade-up delay-1">Todo lo que necesitas en el sendero.</h2>
+      <div class="features-grid">
+        <article class="feature-card fade-up delay-2">
+          <span class="feature-mark">1</span>
+          <h3>Reconocimiento on-device</h3>
+          <p>Modelo descargable en el telefono para identificar especies sin depender de latencia o red.</p>
+        </article>
+        <article class="feature-card fade-up delay-2">
+          <span class="feature-mark">2</span>
+          <h3>Mapas offline con Mapbox</h3>
+          <p>Rutas y regiones descargables para preparar la salida y mantener orientacion en terreno.</p>
+        </article>
+        <article class="feature-card fade-up delay-3">
+          <span class="feature-mark">3</span>
+          <h3>Guia visual coleccionable</h3>
+          <p>Una bitacora viva que convierte especies descubiertas en progreso visible y educativo.</p>
+        </article>
+        <article class="feature-card fade-up delay-3">
+          <span class="feature-mark">4</span>
+          <h3>Captura y foto post-viaje</h3>
+          <p>Sirve tanto para avistamientos en vivo como para fotografos que revisan material despues.</p>
+        </article>
+        <article class="feature-card fade-up delay-4">
+          <span class="feature-mark">5</span>
+          <h3>Sincronizacion al volver</h3>
+          <p>El modelo offline-first permite guardar primero y sincronizar cuando vuelva la conectividad.</p>
+        </article>
+        <article class="feature-card fade-up delay-4">
+          <span class="feature-mark">6</span>
+          <h3>Mapa comunitario</h3>
+          <p>La vision es transformar avistamientos en una capa colaborativa de biodiversidad local.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide slide--dark" id="slide-4">
+    <div class="slide-content" style="text-align:center;">
+      <h2 class="section-title fade-up delay-1" style="margin-left:auto;margin-right:auto;">Explorar, capturar, coleccionar.</h2>
+      <p class="section-lede fade-up delay-2" style="margin-left:auto;margin-right:auto;">
+        Esta slide mantiene el loop central que ya ensayaron: camara, mapa y guia visual.
+      </p>
+      <div class="demo-showcase">
+        <article class="demo-card fade-up delay-3">
+          <div class="demo-phone"><img src="images/app_camera_mockup.png" alt="Pantalla de captura IA"></div>
+          <h3 class="demo-phone-label">Captura IA</h3>
+          <p class="demo-note">Camara con sugerencias de identificacion y confianza.</p>
+        </article>
+        <article class="demo-card fade-up delay-4">
+          <div class="demo-phone"><img src="images/app_map_mockup.png" alt="Pantalla de mapa offline"></div>
+          <h3 class="demo-phone-label">Mapa offline</h3>
+          <p class="demo-note">Rutas, regiones y pins de avistamientos.</p>
+        </article>
+        <article class="demo-card fade-up delay-5">
+          <div class="demo-phone"><img src="images/sticker_book_mockup.png" alt="Pantalla de guia coleccionable"></div>
+          <h3 class="demo-phone-label">Guia coleccionable</h3>
+          <p class="demo-note">Especies desbloqueadas como motivacion educativa.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide slide--dark" id="slide-5">
+    <div class="slide-content">
+      <h2 class="section-title fade-up delay-1">Una oportunidad real en turismo de naturaleza.</h2>
+      <div class="market-layout">
+        <div class="market-opportunity">
+          <article class="tam-panel fade-up delay-2">
+            <h3>TAM</h3>
+            <strong>Apps outdoor, naturaleza y observacion de vida silvestre</strong>
+            <p>Mercado global impulsado por trekking, ecoturismo y aprendizaje con tecnologia movil.</p>
+          </article>
+          <article class="tam-panel fade-up delay-3">
+            <h3>SAM</h3>
+            <strong>Latinoamerica con foco inicial en Chile</strong>
+            <p>Region con parques, turismo de aventura y ecosistemas reconocidos internacionalmente.</p>
+          </article>
+          <article class="tam-panel fade-up delay-4">
+            <h3>SOM</h3>
+            <strong>Excursionistas, turistas y fotografos de naturaleza</strong>
+            <p>Primer mercado alcanzable para validar uso, retencion y alianzas de terreno.</p>
+          </article>
+        </div>
+        <div class="audience-list">
+          <article class="audience-card fade-up delay-3">
+            <span class="audience-role">Usuario primario</span>
+            <div><h4>Excursionistas casuales</h4><p>Buscan una salida mas educativa, simple y memorable.</p></div>
+          </article>
+          <article class="audience-card fade-up delay-4">
+            <span class="audience-role">Creador de contenido</span>
+            <div><h4>Fotografos de naturaleza</h4><p>Quieren registrar y clasificar fotos de campo con contexto.</p></div>
+          </article>
+          <article class="audience-card fade-up delay-5">
+            <span class="audience-role">Validacion experta</span>
+            <div><h4>Educadores y biologos</h4><p>Aportan conocimiento, validacion y uso en salidas educativas.</p></div>
+          </article>
+          <article class="audience-card fade-up delay-6">
+            <span class="audience-role">Turismo internacional</span>
+            <div><h4>Turistas internacionales</h4><p>Visitan Chile buscando naturaleza, pero necesitan contexto local.</p></div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide slide--light" id="slide-6">
+    <div class="slide-content">
+      <h2 class="section-title fade-up delay-1">Monetizamos la experiencia, no la curiosidad.</h2>
+      <div class="revenue-streams">
+        <article class="revenue-card fade-up delay-2">
+          <span class="revenue-mark">01</span>
+          <h3>Merch con especies</h3>
+          <p>Disenos de fauna chilena, gear y productos conectados con la identidad de la app.</p>
+          <span class="revenue-tag">Ingreso directo</span>
+        </article>
+        <article class="revenue-card fade-up delay-3">
+          <span class="revenue-mark">02</span>
+          <h3>Crowdfunding</h3>
+          <p>Campana con acceso anticipado y recompensas para early adopters outdoor.</p>
+          <span class="revenue-tag">Capital semilla</span>
+        </article>
+        <article class="revenue-card fade-up delay-4">
+          <span class="revenue-mark">03</span>
+          <h3>Fondos de impacto</h3>
+          <p>Educacion ambiental, conservacion y turismo sustentable como puertas de entrada.</p>
+          <span class="revenue-tag">Publico / privado</span>
+        </article>
+        <article class="revenue-card fade-up delay-5">
+          <span class="revenue-mark">04</span>
+          <h3>Partners outdoor</h3>
+          <p>Marcas, operadores turisticos y parques para contenido, activaciones y distribucion.</p>
+          <span class="revenue-tag">B2B</span>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide slide--dark" id="slide-7">
+    <div class="slide-content">
+      <h2 class="section-title fade-up delay-1">Base nativa, offline-first y escalable.</h2>
+      <div class="tech-grid">
+        <article class="tech-item fade-up delay-2"><span class="tech-role">Lenguaje</span><h4>Kotlin</h4><p>Lenguaje principal Android.</p></article>
+        <article class="tech-item fade-up delay-2"><span class="tech-role">Interfaz</span><h4>Jetpack Compose</h4><p>Interfaz declarativa Material 3.</p></article>
+        <article class="tech-item fade-up delay-3"><span class="tech-role">IA on-device</span><h4>TensorFlow Lite</h4><p>Inferencia local para especies.</p></article>
+        <article class="tech-item fade-up delay-3"><span class="tech-role">Datos locales</span><h4>Room</h4><p>Persistencia local offline-first.</p></article>
+        <article class="tech-item fade-up delay-4"><span class="tech-role">Arquitectura</span><h4>Hilt</h4><p>Inyeccion de dependencias.</p></article>
+        <article class="tech-item fade-up delay-4"><span class="tech-role">Mapas</span><h4>Mapbox</h4><p>Rutas y regiones offline.</p></article>
+        <article class="tech-item fade-up delay-5"><span class="tech-role">Red</span><h4>Ktor</h4><p>Descarga de modelos y recursos.</p></article>
+        <article class="tech-item fade-up delay-5"><span class="tech-role">Camara</span><h4>CameraX</h4><p>Pipeline de camara optimizado.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide slide--light" id="slide-8">
+    <div class="slide-content">
+      <h2 class="section-title fade-up delay-1">Del MVP al producto completo.</h2>
+      <div class="roadmap-timeline">
+        <article class="roadmap-item fade-up delay-2">
+          <span class="roadmap-dot">01</span>
+          <div class="roadmap-info"><h4>Foundation local <span class="roadmap-status">Completado</span></h4><p>Arquitectura por capas, Room, repositorios, casos de uso e inyeccion con Hilt.</p></div>
+        </article>
+        <article class="roadmap-item fade-up delay-3">
+          <span class="roadmap-dot">02</span>
+          <div class="roadmap-info"><h4>Camara e IA <span class="roadmap-status">Cierre final</span></h4><p>CameraX, modelo on-device, descarga de recursos y flujo de revision de avistamiento.</p></div>
+        </article>
+        <article class="roadmap-item fade-up delay-4">
+          <span class="roadmap-dot">03</span>
+          <div class="roadmap-info"><h4>Mapas offline <span class="roadmap-status">En integracion</span></h4><p>Mapbox, presets de parques, gestor de regiones y pins de capturas.</p></div>
+        </article>
+        <article class="roadmap-item fade-up delay-5">
+          <span class="roadmap-dot">04</span>
+          <div class="roadmap-info"><h4>Sync y comunidad <span class="roadmap-status">Siguiente</span></h4><p>Autenticacion, sincronizacion al recuperar senal y capa comunitaria de avistamientos.</p></div>
+        </article>
+        <article class="roadmap-item fade-up delay-6">
+          <span class="roadmap-dot">05</span>
+          <div class="roadmap-info"><h4>Gamificacion adulta <span class="roadmap-status">Siguiente</span></h4><p>Guia coleccionable, progreso, logros y motivacion educativa sin estetica infantil.</p></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide slide-cta" id="slide-9">
+    <div class="slide-content" style="z-index:2;">
+      <h2 class="cta-title fade-up delay-1">Exploremos <span class="accent">Chile</span> juntos.</h2>
+      <p class="cta-subtitle fade-up delay-2">
+        PataGOnIA conecta tecnologia, naturaleza y educacion ambiental para que cada caminata tenga mas valor, incluso sin senal.
+      </p>
+      <div class="ask-row fade-up delay-3">
+        <span>Inversion</span>
+        <span>Mentoria</span>
+        <span>Partners de terreno</span>
+      </div>
+      <p class="cta-footer fade-up delay-4">PataGOnIA - Power Pitch 2026</p>
+    </div>
+  </section>
+
+  <div class="keyboard-hint" aria-hidden="true">
+    <kbd>Space</kbd><kbd>↓</kbd><span>avanzar</span>
+  </div>
+
+  <script>
+    document.documentElement.classList.add('js');
+
+    const totalSlides = 10;
+    const navDotsContainer = document.getElementById('navDots');
+    const slideCountEl = document.getElementById('slideCount');
+    let currentSlide = 0;
+
+    for (let i = 0; i < totalSlides; i += 1) {
+      const dot = document.createElement('button');
+      dot.type = 'button';
+      dot.className = `nav-dot${i === 0 ? ' active' : ''}`;
+      dot.setAttribute('aria-label', `Ir al slide ${i + 1}`);
+      dot.addEventListener('click', () => {
+        document.getElementById(`slide-${i}`).scrollIntoView({ behavior: 'smooth' });
+      });
+      navDotsContainer.appendChild(dot);
+    }
+
+    function updateNavDots(activeIdx) {
+      document.querySelectorAll('.nav-dot').forEach((dot, i) => {
+        dot.classList.toggle('active', i === activeIdx);
+      });
+      slideCountEl.textContent = `${activeIdx + 1} / ${totalSlides}`;
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const idx = Number(entry.target.id.split('-')[1]);
+        currentSlide = idx;
+        updateNavDots(idx);
+        entry.target.querySelectorAll('.fade-up').forEach((el) => el.classList.add('visible'));
+      });
+    }, { threshold: 0.48 });
+
+    document.querySelectorAll('.slide').forEach((slide) => observer.observe(slide));
+
+    document.addEventListener('keydown', (event) => {
+      const forward = ['ArrowDown', 'ArrowRight', ' ', 'PageDown'];
+      const backward = ['ArrowUp', 'ArrowLeft', 'PageUp'];
+
+      if (forward.includes(event.key)) {
+        event.preventDefault();
+        if (currentSlide < totalSlides - 1) {
+          document.getElementById(`slide-${currentSlide + 1}`).scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+
+      if (backward.includes(event.key)) {
+        event.preventDefault();
+        if (currentSlide > 0) {
+          document.getElementById(`slide-${currentSlide - 1}`).scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    });
+  </script>
+</body>
+</html>

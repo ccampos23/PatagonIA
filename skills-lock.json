@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "ai-video-generation": {
+      "source": "agentspace-so/runcomfy-agent-skills",
+      "sourceType": "github",
+      "skillPath": "ai-video-generation/SKILL.md",
+      "computedHash": "e7a373961e0196280ecf1de3ddbfb10c5a74f3f5305cb2718284e6f06b1c7d65"
+    },
     "android-architecture-clean": {
       "source": "krutikJain/android-agent-skills",
       "sourceType": "autoskills-registry",
@@ -70,11 +76,59 @@
       "skillPath": "skills/kotlin-springboot/SKILL.md",
       "computedHash": "beaa34d307bfcce5dd026e3b03c357f98f471b0de1b9fc6a0b7a64d132b74e95"
     },
+    "mapbox-android-patterns": {
+      "source": "mapbox/mapbox-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/mapbox-android-patterns/SKILL.md",
+      "computedHash": "bb6aa2b6e6d117281ea75bad68a18ab3acffff493c08fa19810898829b3512ad"
+    },
+    "mapbox-cartography": {
+      "source": "mapbox/mapbox-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/mapbox-cartography/SKILL.md",
+      "computedHash": "53601b0955c1d07c86f6e0408bf05c0dae5c52d69b038d47e382976b7377d88a"
+    },
+    "mapbox-data-visualization-patterns": {
+      "source": "mapbox/mapbox-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/mapbox-data-visualization-patterns/SKILL.md",
+      "computedHash": "e210b2da957db517c4e4a2e7db8c76c29e91e00d89ea7d75351bc2e3e948e03f"
+    },
+    "mapbox-flutter-patterns": {
+      "source": "mapbox/mapbox-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/mapbox-flutter-patterns/SKILL.md",
+      "computedHash": "f67df6d6160fc404b62b9b7888e40f0ec3f037e6d39358ad4f67751ba595696b"
+    },
+    "mapbox-location-grounding": {
+      "source": "mapbox/mapbox-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/mapbox-location-grounding/SKILL.md",
+      "computedHash": "056d549a99df6fe891f5eaf17ab39c28df0ce484b83f1bdd7642ae13d598821c"
+    },
+    "mapbox-style-patterns": {
+      "source": "mapbox/mapbox-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/mapbox-style-patterns/SKILL.md",
+      "computedHash": "ed8908002221a48262aa2811c9f8ba19bd884c155ba050cb5ea65abd9bc82641"
+    },
+    "mapbox-style-quality": {
+      "source": "mapbox/mapbox-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/mapbox-style-quality/SKILL.md",
+      "computedHash": "f15c2874eb42e857f831a20186879be33a3d41e8032f1d0ed32488d36f496950"
+    },
     "mobile-android-design": {
       "source": "wshobson/agents",
       "sourceType": "github",
       "skillPath": "plugins/ui-design/skills/mobile-android-design/SKILL.md",
       "computedHash": "bcb274bcc4e0ad076b5947f90e5a247f370ed4da1274b2b7347dc293ee396309"
+    },
+    "slidev": {
+      "source": "slidevjs/slidev",
+      "sourceType": "github",
+      "skillPath": "skills/slidev/SKILL.md",
+      "computedHash": "a495cfada5d3b29c66c2fbbccb4ef9887d6b12bd7e440d100deea89e529c1a7b"
     },
     "supabase": {
       "source": "supabase/agent-skills",

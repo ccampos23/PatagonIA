@@ -3,6 +3,7 @@ package com.patagonia.app.presentation
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -44,9 +45,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Hide bottom system navigation bar for immersive experience
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        val insetsController = WindowInsetsControllerCompat(window, window.decorView)
+        enableEdgeToEdge()
+        val insetsController = WindowCompat.getInsetsController(window, window.decorView)
+        insetsController.show(WindowInsetsCompat.Type.statusBars())
         insetsController.hide(WindowInsetsCompat.Type.navigationBars())
         insetsController.systemBarsBehavior =
             WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
@@ -141,6 +142,14 @@ class MainActivity : ComponentActivity() {
                     }
                 }
             }
+        }
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) {
+            val insetsController = WindowCompat.getInsetsController(window, window.decorView)
+            insetsController.hide(WindowInsetsCompat.Type.navigationBars())
         }
     }
 }

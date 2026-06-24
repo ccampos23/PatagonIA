@@ -3,7 +3,6 @@ package com.patagonia.app.presentation
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -20,7 +19,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.patagonia.app.presentation.theme.CaptureTheme
 import com.patagonia.app.presentation.theme.PatagoniaTheme
@@ -40,12 +43,19 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
+        // Hide status bar and navigation bar (notch) for immersive experience
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        val insetsController = WindowInsetsControllerCompat(window, window.decorView)
+        insetsController.hide(WindowInsetsCompat.Type.statusBars())
+        insetsController.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+
         setContent {
             PatagoniaTheme {
                 CaptureTheme {
-                    var showMainApp by remember { mutableStateOf(false) }
-                    var currentScreen by remember { mutableStateOf(TestingScreen.CAMERA) }
+                    var showMainApp by rememberSaveable { mutableStateOf(false) }
+                    var currentScreen by rememberSaveable { mutableStateOf(TestingScreen.CAMERA) }
 
                     if (showMainApp) {
                         Scaffold(
@@ -54,20 +64,20 @@ class MainActivity : ComponentActivity() {
                                     NavigationBarItem(
                                         selected = currentScreen == TestingScreen.CAMERA,
                                         onClick = { currentScreen = TestingScreen.CAMERA },
-                                        icon = { Icon(Icons.Default.PhotoCamera, contentDescription = "Camera") },
-                                        label = { Text("Camera") }
+                                        icon = { Icon(Icons.Default.PhotoCamera, contentDescription = "Cámara") },
+                                        label = { Text("Cámara") }
                                     )
                                     NavigationBarItem(
                                         selected = currentScreen == TestingScreen.MAP,
                                         onClick = { currentScreen = TestingScreen.MAP },
-                                        icon = { Icon(Icons.Default.Map, contentDescription = "Map") },
-                                        label = { Text("Map") }
+                                        icon = { Icon(Icons.Default.Map, contentDescription = "Mapa") },
+                                        label = { Text("Mapa") }
                                     )
                                     NavigationBarItem(
                                         selected = currentScreen == TestingScreen.DOWNLOADS,
                                         onClick = { currentScreen = TestingScreen.DOWNLOADS },
-                                        icon = { Icon(Icons.Default.Download, contentDescription = "Downloads") },
-                                        label = { Text("Downloads") }
+                                        icon = { Icon(Icons.Default.Download, contentDescription = "Descargas") },
+                                        label = { Text("Descargas") }
                                     )
                                 }
                             }

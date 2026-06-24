@@ -22,6 +22,7 @@
         <activity
             android:name=".presentation.MainActivity"
             android:exported="true"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
             android:theme="@style/Theme.PatagonIA">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

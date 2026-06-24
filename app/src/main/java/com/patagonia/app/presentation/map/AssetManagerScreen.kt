@@ -50,7 +50,6 @@ import com.patagonia.app.presentation.theme.extendedColors
 import com.patagonia.app.presentation.viewmodel.AssetManagerUiState
 import com.patagonia.app.presentation.viewmodel.AssetManagerViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AssetManagerScreen(
     viewModel: AssetManagerViewModel = hiltViewModel(),
@@ -59,38 +58,20 @@ fun AssetManagerScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Gestor de Mapas Sin Conexión") },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
-            )
-        },
+    AssetManagerContent(
+        uiState = uiState,
+        onPresetDownload = viewModel::startPresetDownload,
+        onCustomNameChange = viewModel::updateCustomRegionName,
+        onCoordinatesChange = viewModel::updateCoordinates,
+        onCustomDownload = viewModel::startCustomDownload,
+        onDeleteRegion = viewModel::deleteRegion,
+        onPauseDownload = viewModel::pauseDownload,
+        onResumeDownload = viewModel::resumeDownload,
+        onCancelDownload = viewModel::cancelDownload,
         modifier = modifier
-    ) { innerPadding ->
-        AssetManagerContent(
-            uiState = uiState,
-            onPresetDownload = viewModel::startPresetDownload,
-            onCustomNameChange = viewModel::updateCustomRegionName,
-            onCoordinatesChange = viewModel::updateCoordinates,
-            onCustomDownload = viewModel::startCustomDownload,
-            onDeleteRegion = viewModel::deleteRegion,
-            onPauseDownload = viewModel::pauseDownload,
-            onResumeDownload = viewModel::resumeDownload,
-            onCancelDownload = viewModel::cancelDownload,
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-        )
-    }
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    )
 }
 
 @Composable

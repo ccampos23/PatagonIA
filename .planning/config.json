@@ -1,5 +1,5 @@
 {
-  "model_profile": "balanced",
+  "model_profile": "adaptive",
   "commit_docs": true,
   "parallelization": true,
   "search_gitignored": false,
@@ -83,13 +83,18 @@
     "source_grounding_authority": "grep"
   },
   "resolve_model_ids": true,
-  "runtime": "antigravity",
-  "model_profile_overrides": {
-    "antigravity": {
-      "opus": "claude-opus-4-6",
-      "sonnet": "claude-sonnet-4-6",
-      "haiku": "gemini-3.5-flash"
-    }
+  "runtime": "opencode",
+  "model_policy": {
+    "provider": "generic",
+    "high": "openai/gpt-5.5",
+    "medium": "zai-coding-plan/glm-5.2",
+    "low": "opencode/deepseek-v4-flash-free"
+  },
+  "model_overrides": {
+    "gsd-code-reviewer": "zai-coding-plan/glm-5.2",
+    "gsd-security-auditor": "zai-coding-plan/glm-5.2",
+    "gsd-ui-auditor": "zai-coding-plan/glm-5.2",
+    "gsd-ui-checker": "zai-coding-plan/glm-5.2"
   },
   "mode": "yolo",
   "granularity": "standard"

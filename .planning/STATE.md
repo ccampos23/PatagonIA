@@ -2,12 +2,12 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: Planning Phase 04
-last_updated: "2026-07-06T18:40:18.543Z"
+status: Executing Phase 04
+last_updated: "2026-07-06T22:29:34.047Z"
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 5
+  total_plans: 8
   completed_plans: 5
   percent: 60
 ---
@@ -19,5 +19,5 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-08)
 
 **Core value:** Personal offline nature journal (Map + ML Recognition + Personal captures) — it must provide a 100% reliable offline map and species capture experience even when deep in the wilderness without signal.
-**Current focus:** Phase 04 — Sync Engine & Supabase
+**Current focus:** Phase 04 — sync-engine-supabase
 **Last completed:** Phase 3: Offline Maps (2026-07-06)

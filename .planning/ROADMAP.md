@@ -8,7 +8,7 @@ PataGOnIA is an interactive offline-first nature journal Android application. Th
 
 - [x] **Phase 1: Foundation & Local DB** - Establish the single source of truth using Room and Clean Architecture.
 - [x] **Phase 2: Camera & ML Kit Integration** - Implement real-time on-device species recognition.
-- [ ] **Phase 3: Offline Maps** - Integrate Mapbox Maps SDK for Android (Compose) and regional asset downloading.
+- [x] **Phase 3: Offline Maps** - Integrate Mapbox Maps SDK for Android (Compose) and regional asset downloading.
 - [ ] **Phase 4: Sync Engine & Supabase** - Build bidirectional synchronization using WorkManager.
 - [ ] **Phase 5: Gamification & UI Polish** - Build the Sticker Book and Two-Tier reward system.
 
@@ -63,15 +63,16 @@ Plans:
   2. Users can download specific regional tile and style packs for offline use.
   3. Captures are plotted as pins on the offline map.
 
-**Plans**: 2 plans
-Plans:
+**Plans**: 3 plans
+Plans:
 **Wave 1**
 
 - [x] 03-01: Integrate Mapbox Maps SDK and configure local tile rendering.
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 03-02: Build UI for Asset Manager to download offline trail maps.
+- [x] 03-02: Build UI for Asset Manager to download offline trail maps.
+- [x] 03-03: Configure Mapbox TileStore storage/cache, compass toggle, tooltips, and density sighting clustering.
 
 ### Phase 4: Sync Engine & Supabase
 
@@ -119,6 +120,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Foundation & Local DB | 3/3 | ✅ Complete | 2026-06-14 |
 | 2. Camera & ML Kit | 3/3 | ✅ Complete | 2026-06-15 |
-| 3. Offline Maps | 1/3 | In Progress|  |
+| 3. Offline Maps | 3/3 | ✅ Complete | 2026-07-06 |
 | 4. Sync Engine & Supabase | 0/3 | Not started | - |
 | 5. Gamification & UI Polish | 0/2 | Not started | - |

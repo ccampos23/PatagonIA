@@ -13,11 +13,13 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
 
+import com.patagonia.app.domain.repository.LocationTracker
 import com.patagonia.app.domain.model.SyncStatus
 
 @HiltViewModel
 class CameraViewModel @Inject constructor(
-    private val addCaptureUseCase: AddCaptureUseCase
+    private val addCaptureUseCase: AddCaptureUseCase,
+    private val locationTracker: LocationTracker
 ) : ViewModel() {
 
     private val _recognitions = MutableStateFlow<List<Recognition>>(emptyList())
@@ -32,8 +34,14 @@ class CameraViewModel @Inject constructor(
             val captureId = UUID.randomUUID().toString()
             val timestamp = System.currentTimeMillis()
             
-            val mockLatitude = -45.5712 + (Math.random() - 0.5) * 0.1
-            val mockLongitude = -72.0685 + (Math.random() - 0.5) * 0.1
+            val location = try {
+                locationTracker.getCurrentLocation()
+            } catch (e: Exception) {
+                null
+            }
+
+            val latitude = location?.latitude ?: -45.57
+            val longitude = location?.longitude ?: -72.06
 
             val capture = Capture(
                 id = captureId,
@@ -41,8 +49,8 @@ class CameraViewModel @Inject constructor(
                 scientificName = scientificName?.trim() ?: "Species indet.",
                 timestamp = timestamp,
                 imagePath = imagePath,
-                latitude = mockLatitude,
-                longitude = mockLongitude,
+                latitude = latitude,
+                longitude = longitude,
                 altitude = null,
                 confidence = confidence,
                 notes = notes?.trim(),

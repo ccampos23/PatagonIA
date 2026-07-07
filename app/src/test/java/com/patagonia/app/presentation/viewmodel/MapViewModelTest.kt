@@ -215,5 +215,67 @@ class MapViewModelTest {
         assertEquals(MapUiState.DEFAULT_LATITUDE, state.cameraLatitude, 0.001)
         assertEquals(MapUiState.DEFAULT_LONGITUDE, state.cameraLongitude, 0.001)
     }
+
+    @Test
+    fun `all captures with valid coordinates are preserved in state for marker rendering`() = runTest {
+        val captures = listOf(
+            Capture(
+                id = "c1",
+                speciesName = "Puma",
+                scientificName = "Puma concolor",
+                timestamp = 3000L,
+                imagePath = "/test/puma.jpg",
+                latitude = -51.0,
+                longitude = -73.0,
+                altitude = 500.0,
+                confidence = 0.95f,
+                notes = null,
+                syncStatus = SyncStatus.PENDING_INSERT
+            ),
+            Capture(
+                id = "c2",
+                speciesName = "Condor",
+                scientificName = "Vultur gryphus",
+                timestamp = 2000L,
+                imagePath = "/test/condor.jpg",
+                latitude = -33.4,
+                longitude = -70.6,
+                altitude = 3000.0,
+                confidence = 0.92f,
+                notes = null,
+                syncStatus = SyncStatus.PENDING_INSERT
+            ),
+            Capture(
+                id = "c3",
+                speciesName = "Huemul",
+                scientificName = "Hippocamelus bisulcus",
+                timestamp = 1000L,
+                imagePath = "/test/huemul.jpg",
+                latitude = -48.0,
+                longitude = -72.5,
+                altitude = 800.0,
+                confidence = 0.88f,
+                notes = null,
+                syncStatus = SyncStatus.PENDING_INSERT
+            )
+        )
+        whenever(getCapturesUseCase.invoke()).thenReturn(flowOf(captures))
+        viewModel = MapViewModel(getCapturesUseCase)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        // All captures must be present for marker rendering
+        assertEquals(3, state.captures.size)
+        // Verify coordinates are preserved exactly (marker lat/lng contract)
+        assertEquals(-51.0, state.captures[0].latitude, 0.001)
+        assertEquals(-73.0, state.captures[0].longitude, 0.001)
+        assertEquals(-33.4, state.captures[1].latitude, 0.001)
+        assertEquals(-70.6, state.captures[1].longitude, 0.001)
+        assertEquals(-48.0, state.captures[2].latitude, 0.001)
+        assertEquals(-72.5, state.captures[2].longitude, 0.001)
+        // Camera should center on most recent (first) capture
+        assertEquals(-51.0, state.cameraLatitude, 0.001)
+        assertEquals(-73.0, state.cameraLongitude, 0.001)
+    }
 }
 

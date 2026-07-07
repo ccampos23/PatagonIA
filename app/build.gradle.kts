@@ -118,6 +118,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
 
+    // Coil
+    implementation("io.coil-kt:coil-compose:2.7.0")
+
     // Hilt
     implementation("com.google.dagger:hilt-android:2.54")
     ksp("com.google.dagger:hilt-compiler:2.54")
@@ -161,6 +164,9 @@ dependencies {
     // ML Kit Custom Model Labeling
     implementation("com.google.mlkit:image-labeling-custom:17.0.3")
     implementation("com.google.mlkit:image-labeling:17.0.9")
+
+    // Play Services Location
+    implementation("com.google.android.gms:play-services-location:21.3.0")
 
     // TensorFlow Lite Core
     implementation("org.tensorflow:tensorflow-lite:2.14.0")

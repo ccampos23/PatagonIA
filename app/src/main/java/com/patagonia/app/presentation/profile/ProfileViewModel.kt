@@ -2,6 +2,7 @@ package com.patagonia.app.presentation.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.patagonia.app.domain.model.Capture
 import com.patagonia.app.domain.model.SyncStatus
 import com.patagonia.app.domain.repository.AuthRepository
 import com.patagonia.app.domain.repository.CaptureRepository
@@ -20,7 +21,8 @@ data class ProfileUiState(
     val avatarUrl: String? = null,
     val captureCount: Int = 0,
     val syncErrorCount: Int = 0,
-    val showSyncWarning: Boolean = false
+    val showSyncWarning: Boolean = false,
+    val captures: List<Capture> = emptyList()
 )
 
 @HiltViewModel
@@ -43,7 +45,8 @@ class ProfileViewModel @Inject constructor(
                 avatarUrl = user.avatarUrl,
                 captureCount = captures.size,
                 syncErrorCount = syncErrors,
-                showSyncWarning = syncErrors > 0
+                showSyncWarning = syncErrors > 0,
+                captures = captures
             )
         } else {
             ProfileUiState()

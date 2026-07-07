@@ -36,14 +36,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.patagonia.app.R
 import com.patagonia.app.domain.model.Capture
 import com.patagonia.app.presentation.viewmodel.MapUiState
 import com.patagonia.app.presentation.viewmodel.MapViewModel
@@ -52,6 +57,7 @@ import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportS
 import com.mapbox.maps.extension.compose.style.MapStyle
 import com.mapbox.geojson.Point
 import com.mapbox.maps.extension.compose.annotation.generated.PointAnnotation
+import com.mapbox.maps.extension.compose.annotation.rememberIconImage
 import com.mapbox.maps.CameraOptions
 
 
@@ -103,14 +109,25 @@ fun MapScreenContent(
             }
         }
 
+        // Guard: only animate camera when position actually changes (not on first composition)
+        var hasCameraInitialized by rememberSaveable { mutableStateOf(false) }
         LaunchedEffect(uiState.cameraLatitude, uiState.cameraLongitude) {
-            mapViewportState.easeTo(
-                CameraOptions.Builder()
-                    .center(Point.fromLngLat(uiState.cameraLongitude, uiState.cameraLatitude))
-                    .zoom(uiState.cameraZoom)
-                    .build()
-            )
+            if (hasCameraInitialized) {
+                mapViewportState.easeTo(
+                    CameraOptions.Builder()
+                        .center(Point.fromLngLat(uiState.cameraLongitude, uiState.cameraLatitude))
+                        .zoom(uiState.cameraZoom)
+                        .build()
+                )
+            }
+            hasCameraInitialized = true
         }
+
+        // Load custom map pin drawable as annotation icon (D-23)
+        val markerIcon = rememberIconImage(
+            key = R.drawable.ic_map_pin,
+            painter = painterResource(id = R.drawable.ic_map_pin)
+        )
 
         MapboxMap(
             modifier = Modifier.fillMaxSize(),
@@ -120,12 +137,14 @@ fun MapScreenContent(
             // Draw interactive markers for each species capture on the map (D-23)
             uiState.captures.forEach { capture ->
                 PointAnnotation(
-                    point = Point.fromLngLat(capture.longitude, capture.latitude),
-                    onClick = {
+                    point = Point.fromLngLat(capture.longitude, capture.latitude)
+                ) {
+                    iconImage = markerIcon
+                    interactionsState.onClicked {
                         onCaptureSelected(capture)
                         true
                     }
-                )
+                }
             }
         }
 

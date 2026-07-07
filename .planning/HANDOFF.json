@@ -1,30 +1,43 @@
-{
+﻿{
   "version": "1.0",
-  "timestamp": "2026-06-20T00:13:13.460Z",
-  "phase": "03",
-  "phase_name": "offline-maps",
-  "phase_dir": ".planning/phases/03-offline-maps",
-  "plan": 2,
+  "timestamp": "2026-07-07T02:08:18.570Z",
+  "phase": "04",
+  "phase_name": "sync-engine-supabase",
+  "phase_dir": ".planning/phases/04-sync-engine-supabase",
+  "plan": "01",
   "task": 2,
-  "total_tasks": 2,
+  "total_tasks": 4,
   "status": "paused",
   "completed_tasks": [
-    {"id": 1, "name": "Task 1: Offline Map Downloader Service", "status": "done", "commit": "c236e34"}
+    {"id": 1, "name": "Add Supabase SDK + WorkManager deps, Ktor 3.0 upgrade, BuildConfig for Supabase creds", "status": "done", "commit": "c54d8e6"},
+    {"id": 2, "name": "SupabaseModule + SupabaseAuthDataSource (TDD RED+GREEN, 6/6 tests pass)", "status": "done", "commit": "f60107b,c880d4a"}
   ],
   "remaining_tasks": [
-    {"id": 2, "name": "Task 2: Asset Manager Screen", "status": "not_started"}
+    {"id": 3, "name": "AuthRepository + UserProfile + Auth UseCases (Login/Register/GetSession/Logout) - TDD", "status": "not_started"},
+    {"id": 4, "name": "LoginScreen/RegisterScreen/AuthViewModel + MainActivity auth gate - TDD", "status": "not_started"}
   ],
+  "remaining_plans_in_phase": [
+    {"id": "04-02", "name": "Supabase schema + Room v2 + profile/settings screens", "status": "not_started", "depends_on": ["04-01"]},
+    {"id": "04-03", "name": "WorkManager sync engine", "status": "not_started", "depends_on": ["04-01", "04-02"]}
+  ],
+  "summary_status": {"04-01": "not_created", "04-02": "not_created", "04-03": "not_created"},
   "blockers": [
-    {"description": "Mapbox API token is missing, so Mapbox SDK dependencies are commented out and placeholders are used in code.", "type": "technical", "workaround": "Implement UI and Service logic with mocks/placeholders until token is configured."}
+    {"description": "SUPABASE_URL in local.properties is a placeholder (https://your-project.supabase.co). Required for runtime auth once Task 4 wires the UI.", "type": "human_action", "workaround": "User pastes real Supabase project URL into local.properties before running the app. Does NOT block Task 3 (domain layer, no network)."},
+    {"description": "Execution runtime is opencode (no gsd-executor/gsd-verifier subagents installed); execute-phase fell back to sequential inline execution.", "type": "external", "workaround": "Keep using sequential inline execution. Do NOT spawn Agent(gsd-executor). Follow execute-plan.md inline."},
+    {"description": "User prefers per-task pause checkpoints (not just between plans).", "type": "external", "workaround": "After every task commit, stop and ask user before starting next task."}
   ],
-  "human_actions_pending": [],
+  "human_actions_pending": [
+    {"action": "Paste real SUPABASE_URL into local.properties (Phase 04 - needed for runtime auth + integration testing later).", "context": "anon key already set (sb_publishable_KU6j...); only project URL is missing.", "blocking": false},
+    {"action": "Optional: install gsd agents if you want subagent dispatch for plans 04-02/04-03: npx -y @opengsd/gsd-core@latest --opencode --local.", "context": "init.execute-phase reported agents_installed=false. This is why runtime fell back to inline.", "blocking": false}
+  ],
   "decisions": [
-    {"decision": "Use org.json:json test dependency", "rationale": "Allows running unit tests for TrailGeoJsonParser on JVM without stubbed org.json throwing RuntimeExceptions.", "phase": "03"}
+    {"decision": "Supabase BOM pinned to 3.1.1 (not 3.6.0 as plan said)", "rationale": "BOM 3.6.0 pulls Ktor 3.4.3 compiled with Kotlin metadata 2.3, incompatible with Kotlin 2.1.0. Rule 2 - precleared.", "phase": "04"},
+    {"decision": "androidx.browser force-downgraded to 1.8.0 via resolutionStrategy.force", "rationale": "Transitive 1.10.0 requires compileSdk 36 + AGP 8.9.1; project on 35 + 8.7.3. Rule 2 - precleared.", "phase": "04"},
+    {"decision": "Extracted SupabaseAuthApi interface instead of mocking SupabaseClient directly", "rationale": "SDK DSL is hard to mock; thin wrapper keeps SupabaseAuthDataSource unit-testable. Rule 2 design adjustment.", "phase": "04"},
+    {"decision": "Upgraded Ktor 2.3.12 -> 3.0.0, swapped OkHttp -> Android engine", "rationale": "Required by Supabase Kotlin SDK. Plan-spec. KtorModelDownloader still compiles after fixing onDownload for Ktor 3.0 nullable Long?.", "phase": "04"}
   ],
-  "uncommitted_files": [
-    "app/src/main/java/com/patagonia/app/presentation/viewmodel/AssetManagerUiState.kt",
-    "app/src/test/java/com/patagonia/app/presentation/viewmodel/AssetManagerViewModelTest.kt"
-  ],
-  "next_action": "Implement AssetManagerViewModel.kt to pass the AssetManagerViewModelTest.kt unit tests.",
-  "context_notes": "We successfully implemented and tested the foreground downloading service (TileDownloadService) with background retries, Chilean presets, and notifications. Now we need to implement the AssetManagerViewModel and AssetManagerScreen composable to let the user select parks or custom bounding boxes, verify size limits (<100MB warning, <750k tiles block), and trigger the service."
+  "toolchain_state": {"kotlin": "2.1.0", "agp": "8.7.3", "compileSdk": 35, "ktor": "3.0.0 (force-pinned)", "supabase_bom": "3.1.1 (force-pinned)", "androidx_browser": "1.8.0 (force-pinned)", "notes": "Cannot move to Supabase 3.6.0 / Ktor 3.4.x without Kotlin->2.3, AGP->8.9.1, compileSdk->36. Out of scope for Phase 04 (Rule 4)."},
+  "uncommitted_files": ["opencode.json (pre-existing unrelated diff - leave alone)"],
+  "next_action": "Resume with Task 3 (TDD): write RED failing tests for LoginUseCase/RegisterUseCase/GetSessionUseCase/LogoutUseCase + AuthRepository contract, then implement AuthRepositoryImpl binding SupabaseAuthDataSource. After GREEN+commit, pause for user before Task 4.",
+  "context_notes": "Plan 04-01 has 4 tasks. Tasks 1-2 done (6/6 tests pass). User chose 'execute plan 01 only, then stop' and requested per-task pause checkpoints. After all 4 tasks of plan 04-01 complete, write 04-01-SUMMARY.md and stop. Plans 04-02 and 04-03 out-of-scope this run. TDD enforced (workflow.tdd_mode=true)."
 }

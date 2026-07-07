@@ -2,6 +2,7 @@ package com.patagonia.app.domain.model
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import com.patagonia.app.domain.model.SyncStatus
 
 class MapPinTest {
 
@@ -18,7 +19,7 @@ class MapPinTest {
             altitude = 500.0,
             confidence = 0.95f,
             notes = "Spotted near lake",
-            isSynced = false
+            syncStatus = SyncStatus.PENDING_INSERT
         )
 
         val pin = MapPin.fromCapture(capture)
@@ -37,7 +38,7 @@ class MapPinTest {
             id = "1", speciesName = "Puma", scientificName = null,
             timestamp = 0L, imagePath = "", latitude = 0.0,
             longitude = 0.0, altitude = null, confidence = null,
-            notes = null, isSynced = false
+            notes = null, syncStatus = SyncStatus.PENDING_INSERT
         )
         assertEquals(SpeciesCategory.MAMMAL, MapPin.fromCapture(capture).category)
     }
@@ -48,7 +49,7 @@ class MapPinTest {
             id = "2", speciesName = "Andean Condor", scientificName = null,
             timestamp = 0L, imagePath = "", latitude = 0.0,
             longitude = 0.0, altitude = null, confidence = null,
-            notes = null, isSynced = false
+            notes = null, syncStatus = SyncStatus.PENDING_INSERT
         )
         assertEquals(SpeciesCategory.BIRD, MapPin.fromCapture(capture).category)
     }

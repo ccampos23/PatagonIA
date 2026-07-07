@@ -37,4 +37,12 @@ class SupabaseAuthDataSource @Inject constructor(
     suspend fun getCurrentSessionSnapshot(): UserProfile? = api.currentSession()
 
     suspend fun logout() = api.signOut()
+
+    suspend fun updateProfile(bio: String, isPrivate: Boolean): UserProfile {
+        return try {
+            api.updateProfile(bio, isPrivate)
+        } catch (e: Throwable) {
+            throw AuthException(e.message ?: "Failed to update profile", e)
+        }
+    }
 }

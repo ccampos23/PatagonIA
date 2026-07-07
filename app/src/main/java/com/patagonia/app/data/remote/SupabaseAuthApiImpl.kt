@@ -73,13 +73,35 @@ class SupabaseAuthApiImpl @Inject constructor(
         auth.signOut()
     }
 
+    override suspend fun updateProfile(bio: String, isPrivate: Boolean): UserProfile {
+        val user = auth.updateUser {
+            data = buildJsonObject {
+                val currentMetadata = auth.currentUserOrNull()?.userMetadata ?: buildJsonObject {}
+                currentMetadata.forEach { (key, value) ->
+                    put(key, value)
+                }
+                put("bio", JsonPrimitive(bio))
+                put("isPrivate", JsonPrimitive(isPrivate))
+            }
+        }
+        return user.toUserProfile()
+    }
+
     private fun UserInfo.toUserProfile(): UserProfile {
         val metadata = userMetadata
         val username = metadata?.get(USERNAME_METADATA_KEY)?.jsonPrimitive?.content ?: ""
+        val bio = metadata?.get("bio")?.jsonPrimitive?.content ?: ""
+        val level = metadata?.get("level")?.jsonPrimitive?.content?.toIntOrNull() ?: 1
+        val isPrivate = metadata?.get("isPrivate")?.jsonPrimitive?.content?.toBooleanStrictOrNull() ?: true
+        val avatarUrl = metadata?.get("avatarUrl")?.jsonPrimitive?.content
         return UserProfile(
             id = id,
             email = email ?: "",
-            username = username
+            username = username,
+            avatarUrl = avatarUrl,
+            bio = bio,
+            level = level,
+            isPrivate = isPrivate
         )
     }
 

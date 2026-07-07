@@ -3,6 +3,8 @@ package com.patagonia.app.di
 import com.patagonia.app.BuildConfig
 import com.patagonia.app.data.remote.SupabaseAuthApi
 import com.patagonia.app.data.remote.SupabaseAuthApiImpl
+import com.patagonia.app.data.remote.SupabaseCaptureApi
+import com.patagonia.app.data.remote.SupabaseCaptureApiImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -33,6 +35,10 @@ abstract class SupabaseModule {
     @Binds
     @Singleton
     abstract fun bindSupabaseAuthApi(impl: SupabaseAuthApiImpl): SupabaseAuthApi
+
+    @Binds
+    @Singleton
+    abstract fun bindSupabaseCaptureApi(impl: SupabaseCaptureApiImpl): SupabaseCaptureApi
 
     companion object {
 

@@ -51,4 +51,10 @@ interface AuthRepository {
      * Returns true if the username is not taken.
      */
     suspend fun isUsernameAvailable(username: String): Boolean
+
+    /**
+     * Update the authenticated user's profile metadata (bio, privacy setting).
+     * Returns [Result.success] with updated [UserProfile] or [Result.failure] on error.
+     */
+    suspend fun updateProfile(bio: String, isPrivate: Boolean): Result<UserProfile>
 }

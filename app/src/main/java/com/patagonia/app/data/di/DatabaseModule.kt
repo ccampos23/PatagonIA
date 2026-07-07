@@ -22,7 +22,8 @@ object DatabaseModule {
             context,
             PatagoniaDatabase::class.java,
             "patagonia_database"
-        ).build()
+        ).addMigrations(PatagoniaDatabase.MIGRATION_1_2)
+            .build()
     }
 
     @Provides

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Map
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -38,10 +39,12 @@ import com.patagonia.app.presentation.ui.LoadingScreen
 import com.patagonia.app.presentation.ui.ReviewScreen
 import com.patagonia.app.presentation.map.MapScreen
 import com.patagonia.app.presentation.map.AssetManagerScreen
+import com.patagonia.app.presentation.profile.ProfileScreen
+import com.patagonia.app.presentation.settings.SettingsScreen
 import dagger.hilt.android.AndroidEntryPoint
 
 enum class TestingScreen {
-    CAMERA, MAP, DOWNLOADS
+    CAMERA, MAP, DOWNLOADS, PROFILE, SETTINGS
 }
 
 /**
@@ -98,6 +101,12 @@ class MainActivity : ComponentActivity() {
                                             icon = { Icon(Icons.Default.Download, contentDescription = "Descargas") },
                                             label = { Text("Descargas") }
                                         )
+                                        NavigationBarItem(
+                                            selected = currentScreen == TestingScreen.PROFILE || currentScreen == TestingScreen.SETTINGS,
+                                            onClick = { currentScreen = TestingScreen.PROFILE },
+                                            icon = { Icon(Icons.Default.Person, contentDescription = "Perfil") },
+                                            label = { Text("Perfil") }
+                                        )
                                     }
                                 }
                             ) { innerPadding ->
@@ -105,7 +114,7 @@ class MainActivity : ComponentActivity() {
                                     modifier = Modifier
                                         .fillMaxSize()
                                         .padding(innerPadding)
-                                ) {
+                                    ) {
                                     when (currentScreen) {
                                         TestingScreen.CAMERA -> {
                                             val cameraViewModel: com.patagonia.app.presentation.viewmodel.CameraViewModel = hiltViewModel()
@@ -143,6 +152,18 @@ class MainActivity : ComponentActivity() {
                                         TestingScreen.DOWNLOADS -> {
                                             AssetManagerScreen(
                                                 onBackClick = { currentScreen = TestingScreen.CAMERA },
+                                                modifier = Modifier.fillMaxSize()
+                                            )
+                                        }
+                                        TestingScreen.PROFILE -> {
+                                            ProfileScreen(
+                                                onNavigateToSettings = { currentScreen = TestingScreen.SETTINGS },
+                                                modifier = Modifier.fillMaxSize()
+                                            )
+                                        }
+                                        TestingScreen.SETTINGS -> {
+                                            SettingsScreen(
+                                                onBackClick = { currentScreen = TestingScreen.PROFILE },
                                                 modifier = Modifier.fillMaxSize()
                                             )
                                         }

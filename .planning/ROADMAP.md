@@ -9,7 +9,7 @@ PataGOnIA is an interactive offline-first nature journal Android application. Th
 - [x] **Phase 1: Foundation & Local DB** - Establish the single source of truth using Room and Clean Architecture.
 - [x] **Phase 2: Camera & ML Kit Integration** - Implement real-time on-device species recognition.
 - [x] **Phase 3: Offline Maps** - Integrate Mapbox Maps SDK for Android (Compose) and regional asset downloading.
-- [ ] **Phase 4: Sync Engine & Supabase** - Build bidirectional synchronization using WorkManager.
+- [x] **Phase 4: Sync Engine & Supabase** - Build bidirectional synchronization using WorkManager.
 - [ ] **Phase 5: Gamification & UI Polish** - Build the Sticker Book and Two-Tier reward system.
 
 ## Phase Details
@@ -90,8 +90,8 @@ Plans:
 Plans:
 
 - [x] 04-01: Integrate Supabase Kotlin SDK and implement Auth flows.
-- [ ] 04-02: Set up Supabase Database schema for remote captures.
-- [ ] 04-03: Build WorkManager bidirectional sync engine for offline-first resilience.
+- [x] 04-02: Set up Supabase Database schema for remote captures.
+- [x] 04-03: Build WorkManager bidirectional sync engine for offline-first resilience.
 
 ### Phase 5: Gamification & UI Polish
 
@@ -121,5 +121,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Foundation & Local DB | 3/3 | ✅ Complete | 2026-06-14 |
 | 2. Camera & ML Kit | 3/3 | ✅ Complete | 2026-06-15 |
 | 3. Offline Maps | 3/3 | ✅ Complete | 2026-07-06 |
-| 4. Sync Engine & Supabase | 1/3 | In progress | - |
+| 4. Sync Engine & Supabase | 3/3 | ✅ Complete | 2026-07-07 |
 | 5. Gamification & UI Polish | 0/2 | Not started | - |

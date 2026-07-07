@@ -13,6 +13,8 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
 
+import com.patagonia.app.domain.model.SyncStatus
+
 @HiltViewModel
 class CameraViewModel @Inject constructor(
     private val addCaptureUseCase: AddCaptureUseCase
@@ -44,7 +46,7 @@ class CameraViewModel @Inject constructor(
                 altitude = null,
                 confidence = confidence,
                 notes = notes?.trim(),
-                isSynced = false
+                syncStatus = SyncStatus.PENDING_INSERT
             )
 
             addCaptureUseCase(capture)

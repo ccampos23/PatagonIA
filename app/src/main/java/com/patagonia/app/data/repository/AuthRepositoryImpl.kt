@@ -69,4 +69,13 @@ class AuthRepositoryImpl @Inject constructor(
         // errors from the data source.
         return true
     }
+
+    override suspend fun updateProfile(bio: String, isPrivate: Boolean): Result<UserProfile> {
+        return try {
+            val updated = dataSource.updateProfile(bio, isPrivate)
+            Result.success(updated)
+        } catch (e: AuthException) {
+            Result.failure(e)
+        }
+    }
 }

@@ -18,4 +18,6 @@ interface SupabaseAuthApi {
     suspend fun currentSession(): UserProfile?
 
     suspend fun signOut()
+
+    suspend fun updateProfile(bio: String, isPrivate: Boolean): UserProfile
 }

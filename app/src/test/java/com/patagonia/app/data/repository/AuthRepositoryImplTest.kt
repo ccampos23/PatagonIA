@@ -49,7 +49,7 @@ class AuthRepositoryImplTest {
     @Test
     fun `login returns failure with AuthException on invalid credentials`() = runTest {
         whenever(dataSource.login("user@test.com", "wrong-password"))
-            .thenThrow(AuthException("Invalid credentials"))
+            .thenAnswer { throw AuthException("Invalid credentials") }
 
         val result = repository.login("user@test.com", "wrong-password")
 
@@ -77,7 +77,7 @@ class AuthRepositoryImplTest {
     @Test
     fun `register returns failure on AuthException`() = runTest {
         whenever(dataSource.register("dup@test.com", "password123", "dupuser"))
-            .thenThrow(AuthException("User already registered"))
+            .thenAnswer { throw AuthException("User already registered") }
 
         val result = repository.register("dup@test.com", "password123", "dupuser")
 
@@ -95,7 +95,7 @@ class AuthRepositoryImplTest {
 
     @Test
     fun `logout returns failure on AuthException`() = runTest {
-        whenever(dataSource.logout()).thenThrow(AuthException("Logout failed"))
+        whenever(dataSource.logout()).thenAnswer { throw AuthException("Logout failed") }
 
         val result = repository.logout()
 

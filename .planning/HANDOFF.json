@@ -1,43 +1,37 @@
-﻿{
+{
   "version": "1.0",
-  "timestamp": "2026-07-07T02:08:18.570Z",
+  "timestamp": "2026-07-07T05:03:00.000Z",
   "phase": "04",
   "phase_name": "sync-engine-supabase",
   "phase_dir": ".planning/phases/04-sync-engine-supabase",
   "plan": "01",
-  "task": 2,
-  "total_tasks": 4,
-  "status": "paused",
+  "status": "completed",
   "completed_tasks": [
     {"id": 1, "name": "Add Supabase SDK + WorkManager deps, Ktor 3.0 upgrade, BuildConfig for Supabase creds", "status": "done", "commit": "c54d8e6"},
-    {"id": 2, "name": "SupabaseModule + SupabaseAuthDataSource (TDD RED+GREEN, 6/6 tests pass)", "status": "done", "commit": "f60107b,c880d4a"}
+    {"id": 2, "name": "SupabaseModule + SupabaseAuthDataSource (TDD RED+GREEN, 6/6 tests pass)", "status": "done", "commit": "f60107b,c880d4a"},
+    {"id": 3, "name": "AuthRepository + UserProfile + Auth UseCases (Login/Register/GetSession/Logout) - TDD", "status": "done", "commit": "f138e88,a3712df"},
+    {"id": 4, "name": "LoginScreen/RegisterScreen/AuthViewModel + MainActivity auth gate - TDD", "status": "done", "commit": "d9d72a3,0632388"}
   ],
-  "remaining_tasks": [
-    {"id": 3, "name": "AuthRepository + UserProfile + Auth UseCases (Login/Register/GetSession/Logout) - TDD", "status": "not_started"},
-    {"id": 4, "name": "LoginScreen/RegisterScreen/AuthViewModel + MainActivity auth gate - TDD", "status": "not_started"}
-  ],
+  "remaining_tasks": [],
   "remaining_plans_in_phase": [
     {"id": "04-02", "name": "Supabase schema + Room v2 + profile/settings screens", "status": "not_started", "depends_on": ["04-01"]},
     {"id": "04-03", "name": "WorkManager sync engine", "status": "not_started", "depends_on": ["04-01", "04-02"]}
   ],
-  "summary_status": {"04-01": "not_created", "04-02": "not_created", "04-03": "not_created"},
+  "summary_status": {"04-01": "created", "04-02": "not_created", "04-03": "not_created"},
   "blockers": [
-    {"description": "SUPABASE_URL in local.properties is a placeholder (https://your-project.supabase.co). Required for runtime auth once Task 4 wires the UI.", "type": "human_action", "workaround": "User pastes real Supabase project URL into local.properties before running the app. Does NOT block Task 3 (domain layer, no network)."},
-    {"description": "Execution runtime is opencode (no gsd-executor/gsd-verifier subagents installed); execute-phase fell back to sequential inline execution.", "type": "external", "workaround": "Keep using sequential inline execution. Do NOT spawn Agent(gsd-executor). Follow execute-plan.md inline."},
-    {"description": "User prefers per-task pause checkpoints (not just between plans).", "type": "external", "workaround": "After every task commit, stop and ask user before starting next task."}
+    {"description": "SUPABASE_URL in local.properties is a placeholder (https://your-project.supabase.co). Required for runtime auth once the screens are run on-device.", "type": "human_action", "workaround": "User pastes real Supabase project URL into local.properties before running the app. Does NOT block unit tests."}
   ],
   "human_actions_pending": [
-    {"action": "Paste real SUPABASE_URL into local.properties (Phase 04 - needed for runtime auth + integration testing later).", "context": "anon key already set (sb_publishable_KU6j...); only project URL is missing.", "blocking": false},
-    {"action": "Optional: install gsd agents if you want subagent dispatch for plans 04-02/04-03: npx -y @opengsd/gsd-core@latest --opencode --local.", "context": "init.execute-phase reported agents_installed=false. This is why runtime fell back to inline.", "blocking": false}
+    {"action": "Paste real SUPABASE_URL into local.properties (Phase 04 - needed for runtime auth + integration testing).", "context": "anon key already set; only project URL is missing.", "blocking": false}
   ],
   "decisions": [
-    {"decision": "Supabase BOM pinned to 3.1.1 (not 3.6.0 as plan said)", "rationale": "BOM 3.6.0 pulls Ktor 3.4.3 compiled with Kotlin metadata 2.3, incompatible with Kotlin 2.1.0. Rule 2 - precleared.", "phase": "04"},
-    {"decision": "androidx.browser force-downgraded to 1.8.0 via resolutionStrategy.force", "rationale": "Transitive 1.10.0 requires compileSdk 36 + AGP 8.9.1; project on 35 + 8.7.3. Rule 2 - precleared.", "phase": "04"},
-    {"decision": "Extracted SupabaseAuthApi interface instead of mocking SupabaseClient directly", "rationale": "SDK DSL is hard to mock; thin wrapper keeps SupabaseAuthDataSource unit-testable. Rule 2 design adjustment.", "phase": "04"},
-    {"decision": "Upgraded Ktor 2.3.12 -> 3.0.0, swapped OkHttp -> Android engine", "rationale": "Required by Supabase Kotlin SDK. Plan-spec. KtorModelDownloader still compiles after fixing onDownload for Ktor 3.0 nullable Long?.", "phase": "04"}
+    {"decision": "Supabase BOM pinned to 3.1.1 (not 3.6.0 as plan said)", "rationale": "BOM 3.6.0 pulls Ktor 3.4.3 compiled with Kotlin metadata 2.3, incompatible with Kotlin 2.1.0.", "phase": "04"},
+    {"decision": "androidx.browser force-downgraded to 1.8.0 via resolutionStrategy.force", "rationale": "Transitive 1.10.0 requires compileSdk 36 + AGP 8.9.1; project on 35 + 8.7.3.", "phase": "04"},
+    {"decision": "Extracted SupabaseAuthApi interface instead of mocking SupabaseClient directly", "rationale": "SDK DSL is hard to mock; thin wrapper keeps SupabaseAuthDataSource unit-testable.", "phase": "04"},
+    {"decision": "Upgraded Ktor 2.3.12 -> 3.0.0, swapped OkHttp -> Android engine", "rationale": "Required by Supabase Kotlin SDK.", "phase": "04"}
   ],
-  "toolchain_state": {"kotlin": "2.1.0", "agp": "8.7.3", "compileSdk": 35, "ktor": "3.0.0 (force-pinned)", "supabase_bom": "3.1.1 (force-pinned)", "androidx_browser": "1.8.0 (force-pinned)", "notes": "Cannot move to Supabase 3.6.0 / Ktor 3.4.x without Kotlin->2.3, AGP->8.9.1, compileSdk->36. Out of scope for Phase 04 (Rule 4)."},
-  "uncommitted_files": ["opencode.json (pre-existing unrelated diff - leave alone)"],
-  "next_action": "Resume with Task 3 (TDD): write RED failing tests for LoginUseCase/RegisterUseCase/GetSessionUseCase/LogoutUseCase + AuthRepository contract, then implement AuthRepositoryImpl binding SupabaseAuthDataSource. After GREEN+commit, pause for user before Task 4.",
-  "context_notes": "Plan 04-01 has 4 tasks. Tasks 1-2 done (6/6 tests pass). User chose 'execute plan 01 only, then stop' and requested per-task pause checkpoints. After all 4 tasks of plan 04-01 complete, write 04-01-SUMMARY.md and stop. Plans 04-02 and 04-03 out-of-scope this run. TDD enforced (workflow.tdd_mode=true)."
+  "toolchain_state": {"kotlin": "2.1.0", "agp": "8.7.3", "compileSdk": 35, "ktor": "3.0.0 (force-pinned)", "supabase_bom": "3.1.1 (force-pinned)", "androidx_browser": "1.8.0 (force-pinned)", "notes": "Cannot move to Supabase 3.6.0 / Ktor 3.4.x without Kotlin->2.3, AGP->8.9.1, compileSdk->36."},
+  "uncommitted_files": [],
+  "next_action": "Execute plan 04-02: Supabase schema + Room v2 + profile/settings screens.",
+  "context_notes": "Plan 04-01 is fully completed. All 4 tasks done (30/30 auth tests pass). Plan 04-01-SUMMARY.md created."
 }

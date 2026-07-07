@@ -89,7 +89,7 @@ Plans:
 
 Plans:
 
-- [ ] 04-01: Integrate Supabase Kotlin SDK and implement Auth flows.
+- [x] 04-01: Integrate Supabase Kotlin SDK and implement Auth flows.
 - [ ] 04-02: Set up Supabase Database schema for remote captures.
 - [ ] 04-03: Build WorkManager bidirectional sync engine for offline-first resilience.
 
@@ -121,5 +121,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Foundation & Local DB | 3/3 | ✅ Complete | 2026-06-14 |
 | 2. Camera & ML Kit | 3/3 | ✅ Complete | 2026-06-15 |
 | 3. Offline Maps | 3/3 | ✅ Complete | 2026-07-06 |
-| 4. Sync Engine & Supabase | 0/3 | Not started | - |
+| 4. Sync Engine & Supabase | 1/3 | In progress | - |
 | 5. Gamification & UI Polish | 0/2 | Not started | - |

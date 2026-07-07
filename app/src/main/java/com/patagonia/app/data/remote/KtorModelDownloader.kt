@@ -104,7 +104,7 @@ class KtorModelDownloader @Inject constructor(
     ) {
         val response = client.get(url) {
             onDownload { bytesSentTotal, contentLength ->
-                if (contentLength > 0) {
+                if (contentLength != null && contentLength > 0 && bytesSentTotal != null) {
                     val progress = ((bytesSentTotal * 100) / contentLength).toInt()
                     onProgress(progress)
                 }

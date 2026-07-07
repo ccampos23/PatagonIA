@@ -55,6 +55,9 @@ class AuthRepositoryImpl @Inject constructor(
 
     override fun observeSession(): Flow<UserProfile?> = flow {
         emit(dataSource.getCurrentSessionSnapshot())
+        // Keep the flow alive so combine() continues to react
+        // to emissions from other combined flows (e.g. captures).
+        kotlinx.coroutines.awaitCancellation()
     }
 
     override suspend fun getCurrentUser(): UserProfile? {

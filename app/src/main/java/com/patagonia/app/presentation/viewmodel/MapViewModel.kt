@@ -27,10 +27,24 @@ class MapViewModel @Inject constructor(
         observeCaptures()
     }
 
+    private var hasCenteredOnCapture = false
+
     private fun observeCaptures() {
         viewModelScope.launch {
             getCapturesUseCase().collect { captures ->
-                _uiState.update { it.copy(captures = captures) }
+                _uiState.update { state ->
+                    if (!hasCenteredOnCapture && captures.isNotEmpty()) {
+                        hasCenteredOnCapture = true
+                        val mostRecent = captures.first()
+                        state.copy(
+                            captures = captures,
+                            cameraLatitude = mostRecent.latitude,
+                            cameraLongitude = mostRecent.longitude
+                        )
+                    } else {
+                        state.copy(captures = captures)
+                    }
+                }
             }
         }
     }

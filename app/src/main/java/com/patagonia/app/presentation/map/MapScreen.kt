@@ -33,6 +33,7 @@ import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -51,6 +52,7 @@ import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportS
 import com.mapbox.maps.extension.compose.style.MapStyle
 import com.mapbox.geojson.Point
 import com.mapbox.maps.extension.compose.annotation.generated.PointAnnotation
+import com.mapbox.maps.CameraOptions
 
 
 /**
@@ -99,6 +101,15 @@ fun MapScreenContent(
                 center(Point.fromLngLat(uiState.cameraLongitude, uiState.cameraLatitude))
                 zoom(uiState.cameraZoom)
             }
+        }
+
+        LaunchedEffect(uiState.cameraLatitude, uiState.cameraLongitude) {
+            mapViewportState.easeTo(
+                CameraOptions.Builder()
+                    .center(Point.fromLngLat(uiState.cameraLongitude, uiState.cameraLatitude))
+                    .zoom(uiState.cameraZoom)
+                    .build()
+            )
         }
 
         MapboxMap(

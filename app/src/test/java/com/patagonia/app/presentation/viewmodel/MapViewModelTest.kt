@@ -166,5 +166,54 @@ class MapViewModelTest {
         assertEquals(null, state.selectedCapture)
         assertEquals(false, state.isTooltipVisible)
     }
+
+    @Test
+    fun `camera centers on most recent capture when captures available`() = runTest {
+        val olderCapture = Capture(
+            id = "old",
+            speciesName = "Huemul",
+            scientificName = "Hippocamelus bisulcus",
+            timestamp = 1000L,
+            imagePath = "/test/huemul.jpg",
+            latitude = -48.0,
+            longitude = -72.5,
+            altitude = 800.0,
+            confidence = 0.88f,
+            notes = null,
+            syncStatus = SyncStatus.PENDING_INSERT
+        )
+        val newestCapture = Capture(
+            id = "new",
+            speciesName = "Puma",
+            scientificName = "Puma concolor",
+            timestamp = 2000L,
+            imagePath = "/test/puma.jpg",
+            latitude = -45.5,
+            longitude = -72.0,
+            altitude = 500.0,
+            confidence = 0.95f,
+            notes = null,
+            syncStatus = SyncStatus.PENDING_INSERT
+        )
+        // Captures are ordered by timestamp DESC from Room, so newest is first
+        whenever(getCapturesUseCase.invoke()).thenReturn(flowOf(listOf(newestCapture, olderCapture)))
+        viewModel = MapViewModel(getCapturesUseCase)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals(-45.5, state.cameraLatitude, 0.001)
+        assertEquals(-72.0, state.cameraLongitude, 0.001)
+    }
+
+    @Test
+    fun `camera stays at default Chile center when no captures`() = runTest {
+        whenever(getCapturesUseCase.invoke()).thenReturn(flowOf(emptyList()))
+        viewModel = MapViewModel(getCapturesUseCase)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals(MapUiState.DEFAULT_LATITUDE, state.cameraLatitude, 0.001)
+        assertEquals(MapUiState.DEFAULT_LONGITUDE, state.cameraLongitude, 0.001)
+    }
 }
 

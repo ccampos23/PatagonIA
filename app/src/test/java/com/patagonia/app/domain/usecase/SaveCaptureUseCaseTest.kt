@@ -1,0 +1,43 @@
+package com.patagonia.app.domain.usecase
+
+import com.patagonia.app.domain.model.Capture
+import com.patagonia.app.domain.model.SyncStatus
+import com.patagonia.app.domain.repository.CaptureRepository
+import kotlinx.coroutines.test.runTest
+import org.junit.Before
+import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
+
+class SaveCaptureUseCaseTest {
+
+    private lateinit var repository: CaptureRepository
+    private lateinit var useCase: SaveCaptureUseCase
+
+    @Before
+    fun setup() {
+        repository = mock()
+        useCase = SaveCaptureUseCase(repository)
+    }
+
+    @Test
+    fun `invoke calls repository saveCapture`() = runTest {
+        val capture = Capture(
+            id = "test-1",
+            speciesName = "Puma",
+            scientificName = "Puma concolor",
+            timestamp = 1000L,
+            imagePath = "/img",
+            latitude = -50.0,
+            longitude = -73.0,
+            altitude = null,
+            confidence = 0.9f,
+            notes = "",
+            syncStatus = SyncStatus.PENDING_INSERT
+        )
+
+        useCase(capture)
+
+        verify(repository).saveCapture(capture)
+    }
+}

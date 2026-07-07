@@ -13,7 +13,11 @@ fun CaptureEntity.toDomain(): Capture = Capture(
     altitude = altitude,
     confidence = confidence,
     notes = notes,
-    isSynced = isSynced
+    syncStatus = syncStatus,
+    remoteId = remoteId,
+    isShared = isShared,
+    isDeleted = isDeleted,
+    userId = userId
 )
 
 fun Capture.toEntity(): CaptureEntity = CaptureEntity(
@@ -27,5 +31,9 @@ fun Capture.toEntity(): CaptureEntity = CaptureEntity(
     altitude = altitude,
     confidence = confidence,
     notes = notes,
-    isSynced = isSynced
+    syncStatus = syncStatus,
+    remoteId = remoteId,
+    isShared = isShared,
+    isDeleted = isDeleted,
+    userId = userId
 )

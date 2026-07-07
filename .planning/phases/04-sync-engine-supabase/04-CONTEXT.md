@@ -32,8 +32,8 @@ Implement bidirectional synchronization of offline captures and user accounts us
 - **D-12:** Soft Deletes — when a user deletes a capture, mark it `is_deleted = true` in Supabase (preserves record for crowdsourced maps).
 
 ### Data Privacy & Crowdsourcing
-- **D-13:** Private by default — users must manually opt-in each capture to feed the public crowdsourced map.
-- **D-14:** Per-capture toggle — add a "Share to crowdsourced map" toggle on the capture review screen (defaults to off).
+- **D-13:** Shared by default — captures automatically feed the public crowdsourced map unless the user account is set to private.
+- **D-14:** Profile-level privacy — introduce an account-level setting to make the account "Private" (like Instagram), which stops all captures from feeding the public map.
 - **D-15:** Keep coordinates exact when a user shares a capture, so other trekkers can find the exact same spot.
 - **D-16:** Immediate Removal — if a user toggles sharing from ON to OFF after it has synced, send a `PENDING_UPDATE` to Supabase to hide it instantly.
 
@@ -48,6 +48,13 @@ Implement bidirectional synchronization of offline captures and user accounts us
 - **D-22:** Quarantine and Skip corrupted captures — mark as `SYNC_FAILED` locally and continue syncing healthy data.
 - **D-23:** Provide a manual "Retry Sync" button on the capture's details page, with the option to delete it and a clear error message. If sync fails 3 times, backoff maxes out and wait for manual retry.
 - **D-24:** Show standard inline error messages (e.g. "Invalid credentials") directly on the login form.
+
+### Sync Pagination & Notifications
+- **D-25:** Download all captures at once during initial sync; rely on WorkManager's retry mechanism instead of chunking.
+- **D-26:** Background sync via WorkManager must remain completely silent (no OS notifications).
+
+### Token Invalidation
+- **D-27:** If the Supabase token expires while offline, keep the captures locally, mark them as `SYNC_FAILED`, and prompt the user to re-login upon app open.
 
 </decisions>
 

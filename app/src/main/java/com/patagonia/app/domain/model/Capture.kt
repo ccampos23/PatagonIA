@@ -11,5 +11,9 @@ data class Capture(
     val altitude: Double?,
     val confidence: Float?,
     val notes: String?,
-    val isSynced: Boolean = false
+    val syncStatus: SyncStatus = SyncStatus.PENDING_INSERT,
+    val remoteId: String? = null,
+    val isShared: Boolean = false,
+    val isDeleted: Boolean = false,
+    val userId: String? = null
 )

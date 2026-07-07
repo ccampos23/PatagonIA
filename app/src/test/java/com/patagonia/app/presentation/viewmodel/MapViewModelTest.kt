@@ -1,6 +1,7 @@
 package com.patagonia.app.presentation.viewmodel
 
 import com.patagonia.app.domain.model.Capture
+import com.patagonia.app.domain.model.SyncStatus
 import com.patagonia.app.domain.usecase.GetCapturesUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -99,7 +100,7 @@ class MapViewModelTest {
                 altitude = 500.0,
                 confidence = 0.95f,
                 notes = null,
-                isSynced = false
+                syncStatus = SyncStatus.PENDING_INSERT
             )
         )
         whenever(getCapturesUseCase.invoke()).thenReturn(flowOf(captures))
@@ -132,7 +133,7 @@ class MapViewModelTest {
             altitude = 800.0,
             confidence = 0.88f,
             notes = null,
-            isSynced = false
+            syncStatus = SyncStatus.PENDING_INSERT
         )
 
         viewModel.selectCapture(capture)
@@ -154,7 +155,7 @@ class MapViewModelTest {
             altitude = 3000.0,
             confidence = 0.95f,
             notes = null,
-            isSynced = false
+            syncStatus = SyncStatus.PENDING_INSERT
         )
 
         viewModel.selectCapture(capture)

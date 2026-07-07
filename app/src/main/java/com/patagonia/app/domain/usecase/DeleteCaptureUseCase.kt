@@ -7,7 +7,11 @@ import javax.inject.Inject
 class DeleteCaptureUseCase @Inject constructor(
     private val repository: CaptureRepository
 ) {
+    suspend operator fun invoke(id: String) {
+        repository.deleteCapture(id)
+    }
+
     suspend operator fun invoke(capture: Capture) {
-        repository.deleteCapture(capture)
+        repository.deleteCapture(capture.id)
     }
 }
